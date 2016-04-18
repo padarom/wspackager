@@ -1,0 +1,29 @@
+{
+  "name": "wcf-utils",
+  "version": "1.0.0",
+  "description": "A simple NodeJS application that helps you to automatically tarball your WBB packages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unkso/WBB-Packager.git"
+  },
+  "author": "Christopher Mühl <cmuehl@unitybox.de> (https://padarom.io)",
+  "license": "ISC",
+  "bin": {
+    "wcfutils": "bin/utils.js"
+  },
+  "bugs": {
+    "url": "https://github.com/unkso/WBB-Packager/issues"
+  },
+  "homepage": "https://github.com/unkso/WBB-Packager#readme",
+  "dependencies": {
+    "gulp-util": "^3.0.7",
+    "liftoff": "^2.2.1",
+    "minimist": "^1.2.0",
+    "path": "^0.12.7",
+    "through2": "^2.0.1"
+  }
+}

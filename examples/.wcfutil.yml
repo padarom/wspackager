@@ -1,0 +1,29 @@
+package:
+    -
+        destination: dist/com.clanunknownsoldiers.system.awards.tar
+        source_dir: system/awards
+        files:
+            exclude:
+                - .DS_Store
+                - .git
+                - .gitignore
+                - .wcfutil.yml
+            tarball:
+                - templates
+                - files
+            folder:
+                - language
+    -
+        destination: dist/com.clanunknownsoldiers.system.ranks.tar
+        source_dir: system/ranks
+        files:
+            exclude:
+                - .DS_Store
+                - .git
+                - .gitignore
+                - .wcfutil.yml
+            tarball:
+                - templates
+                - files
+            folder:
+                - language
