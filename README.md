@@ -45,4 +45,4 @@ packaging:
         files:
             # ...
 ```
-This example would not use the current working directory as its base path, but the manually specified `base` (__The base option is not yet implemented!__)
+This example would not use the current working directory as its base path, but the manually specified `base` (can also be absolute).

@@ -1,6 +1,6 @@
 {
   "name": "wcf-utils",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "A small application that handles WCF package development utility tasks for you (e.g. creating a .tar archive)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
