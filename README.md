@@ -1,8 +1,8 @@
-# WCF Utils
+# WCF Utils [![npm](https://img.shields.io/npm/v/wcfutils.svg?maxAge=2592000?style=flat-square)](https://www.npmjs.com/package/wcfutils)
 A small library that handles WCF package development utility functions for you. Automatically checks your cwd for a `.wcfutil.yml` which serves as a configuration file for the tasks that you want to run.
 
 ## Installation
-Run `npm install -g wcf-utils` to install the package globally and have its binary added to your PATH.
+Run `npm install -g wcfutils` to install the package globally and have its binary added to your PATH.
 
 ## Usage
 Create a `.wcfutil.yml` in your working directory and run `wcfutils`.
