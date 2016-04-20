@@ -20,10 +20,16 @@
   },
   "homepage": "https://github.com/unkso/WBB-Packager#readme",
   "dependencies": {
+    "async": "^2.0.0-rc.3",
+    "del": "^2.2.0",
+    "fs": "0.0.2",
+    "fstream": "^1.0.8",
     "gulp-util": "^3.0.7",
     "liftoff": "^2.2.1",
     "minimist": "^1.2.0",
     "path": "^0.12.7",
+    "require-yaml": "0.0.1",
+    "tar": "^2.2.1",
     "through2": "^2.0.1"
   }
 }
