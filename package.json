@@ -1,6 +1,6 @@
 {
   "name": "wcfutils",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A small application that handles WCF package development utility tasks for you (e.g. creating a .tar archive)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -28,7 +28,6 @@
     "path": "^0.12.7",
     "chalk": "^1.1.3",
     "del": "^2.2.0",
-    "tar": "^2.2.1",
-    "fs": "0.0.2"
+    "tar": "^2.2.1"
   }
 }

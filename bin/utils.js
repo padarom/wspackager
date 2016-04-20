@@ -3,7 +3,6 @@
 'use strict';
 var path = require('path');
 var shifter = require(path.join('../lib'));
-var chalk = require('chalk');
 var Liftoff = require('liftoff');
 var argv = require('minimist')(process.argv.slice(2));
 require('require-yaml');
@@ -16,8 +15,8 @@ var WCFUtils = new Liftoff({
     modulePath: 'wcfutils',
     configName: '.wcfutil',
     extensions: {
-        '.yaml': 'require-yaml',
-        '.yml':  'require-yaml'
+        '.yaml': null,
+        '.yml': null
     }
 });
 
@@ -29,7 +28,8 @@ WCFUtils.launch({
 
 function invoke(env) {
     if (!env.configPath) {
-        console.log(chalk.red('No wcfutils config found'));
+        console.error('No .wcfutil.yml or .wcfutil.yaml found.');
+        process.exit(1);
     }
     
     // Load the task list
