@@ -1,14 +1,13 @@
 {
   "name": "wcf-utils",
-  "version": "1.0.1",
-  "description": "A simple NodeJS application that helps you to automatically tarball your WBB packages",
-  "main": "index.js",
+  "version": "1.0.22",
+  "description": "A small application that handles WCF package development utility tasks for you (e.g. creating a .tar archive)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unkso/WBB-Packager.git"
+    "url": "git+https://github.com/Padarom/WCF-Utils.git"
   },
   "author": "Christopher Mühl <cmuehl@unitybox.de> (https://padarom.io)",
   "license": "ISC",
@@ -16,15 +15,14 @@
     "wcfutils": "bin/utils.js"
   },
   "bugs": {
-    "url": "https://github.com/unkso/WBB-Packager/issues"
+    "url": "https://github.com/Padarom/WCF-Utils/issues"
   },
-  "homepage": "https://github.com/unkso/WBB-Packager#readme",
+  "homepage": "https://github.com/Padarom/WCF-Utils#readme",
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "del": "^2.2.0",
     "fs": "0.0.2",
     "fstream": "^1.0.8",
-    "gulp-util": "^3.0.7",
     "liftoff": "^2.2.1",
     "minimist": "^1.2.0",
     "path": "^0.12.7",
