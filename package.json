@@ -1,10 +1,11 @@
 {
   "name": "wcfutils",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A small application that handles WCF package development utility tasks for you (e.g. creating a .tar archive)",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Padarom/WCF-Utils.git"
