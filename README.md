@@ -15,9 +15,9 @@ Currently only one task is implemented:
 - [x] Packaging (`package`)
 - [ ] Suggestions for new tasks? [Create an issue!](https://github.com/Padarom/WCF-Utils/issues/new)
 
-### Packaging task
+### Package task
 ```yaml
-packaging: # The task
+package: # The task
     destination: com.example.plugin.tar # The destination file name
     files:
         exclude: # Files or folders that should not show up in the created package
@@ -31,9 +31,9 @@ packaging: # The task
             # You can also specify that the source and destination name
             # should be different: "acpTemplates" gets tarballed into "acptemplate.tar"
 ```
-You can also specify that you want to run multiple packaging tasks like so:
+You can also specify that you want to run multiple package tasks like so:
 ```yaml
-packaging:
+package:
     -
         destination: com.example.plugin.1.tar
         base: plugin-1
