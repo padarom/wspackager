@@ -1,40 +1,14 @@
 #!/usr/bin/env node
 
 'use strict';
-var path = require('path');
-var shifter = require(path.join('../lib'));
-var Liftoff = require('liftoff');
-var argv = require('minimist')(process.argv.slice(2));
-require('require-yaml');
 
-process.env.INIT_CWD = process.cwd();
+const program = require('commander');
+const processor = require('../lib/index');
 
-var WCFUtils = new Liftoff({
-    name: 'wcfutils',
-    processTitle: 'wcfutils',
-    modulePath: 'wcfutils',
-    configName: '.wcfutil',
-    extensions: {
-        '.yaml': null,
-        '.yml': null
-    }
-});
+program
+    .version('0.0.1')
+    .option('-d, --dry-run', 'only output resulting structure without packaging')
+    .option('--tar-gz', 'use .tar.gz instead of the .tar-format')
+    .parse(process.argv);
 
-WCFUtils.launch({
-    cwd: argv.cwd,
-    configPath: argv.utilsfile,
-    completion: argv.completion
-}, invoke);
-
-function invoke(env) {
-    if (!env.configPath) {
-        console.error('No .wcfutil.yml or .wcfutil.yaml found.');
-        process.exit(1);
-    }
-    
-    // Load the task list
-    var tasks = require(env.configPath);
-    shifter.processTaskList(tasks, env);
-
-    // Base Path: env.configBase
-}
+processor(program);

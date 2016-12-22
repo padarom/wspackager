@@ -1,35 +1,36 @@
 {
-  "name": "wcfutils",
-  "version": "1.0.7",
-  "description": "A small application that handles WCF package development utility tasks for you (e.g. creating a .tar archive)",
+  "name": "wcf-packager",
+  "version": "1.0.0-RC",
+  "description": "A small application that handles WCF/WSC packaging for you. Previously known as \"wcfutils\"",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Padarom/WCF-Utils.git"
+    "url": "git+https://github.com/padarom/wcfutils.git"
   },
-  "author": "Christopher Mühl <cmuehl@unitybox.de> (https://padarom.io)",
-  "license": "ISC",
+  "author": "Christopher Mühl <christopher@padarom.io> (https://padarom.io)",
+  "license": "MIT",
   "bin": {
-    "wcfutils": "bin/utils.js"
+    "wcfutils": "bin/packager.js"
   },
   "bugs": {
     "url": "https://github.com/Padarom/WCF-Utils/issues"
   },
   "homepage": "https://github.com/Padarom/WCF-Utils#readme",
   "dependencies": {
-    "require-yaml": "0.0.1",
     "async": "^2.0.0-rc.3",
-    "minimist": "^1.2.0",
-    "through2": "^2.0.1",
+    "chalk": "^1.1.3",
+    "commander": "^2.9.0",
+    "del": "^2.2.0",
     "fstream": "^1.0.8",
     "liftoff": "^2.2.1",
+    "minimist": "^1.2.0",
     "path": "^0.12.7",
-    "chalk": "^1.1.3",
-    "del": "^2.2.0",
-    "tar": "^2.2.1"
+    "require-yaml": "0.0.1",
+    "tar": "^2.2.1",
+    "through2": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
