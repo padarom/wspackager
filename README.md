@@ -1,48 +1,32 @@
-# WCF Utils [![npm](https://img.shields.io/npm/v/wcfutils.svg?style=flat-square)](https://www.npmjs.com/package/wcfutils) [![npm](https://img.shields.io/npm/dt/wcfutils.svg?style=flat-square)](https://www.npmjs.com/package/wcfutils)
-A small library that handles WCF package development utility functions for you. Automatically checks your cwd for a `.wcfutil.yml` which serves as a configuration file for the tasks that you want to run.
+# WoltLab Suite Packager
+A small library that handles WCF/WSC packaging for you. It automatically analyses the instructions in your `package.xml` to determine which files to package. You won't need to create any additional configuration files or adjust the way you work. Simply follow some very basic guidelines and run the program.
 
-## Installation
-Run `npm install -g wcfutils` to install the package globally and have its binary added to your PATH.
+## Installation and Usage
+Run `npm install -g wspackager` to install the package globally and have its binary added to your PATH.
 
-## Usage
-Create a `.wcfutil.yml` in your working directory and run `wcfutils`.
+Once installed, simply run `wspackager`.
 
-Examples for the configuration file can be found in `examples/` and will be further documented at a later point.
+## Options
+There's several options you can run this program with, which shall be listed below.
 
-### Possible tasks
-Currently only one task is implemented:
+#### `--pretend` (`-p`)
+wspackager simply outputs the resulting package structure, but don't actually performs the packaging. You can use this to test whether your application is going to be correctly packaged beforehand.
 
-- [x] Packaging (`package`)
-- [ ] Suggestions for new tasks? [Create an issue!](https://github.com/Padarom/WCF-Utils/issues/new)
+#### `--gzip` (`-g`)
+The default archive format used is `.tar`. You can use this option if you want or need to package to a `.tar.gz` archive instead.
 
-### Package task
-```yaml
-package: # The task
-    destination: com.example.plugin.tar # The destination file name
-    files:
-        exclude: # Files or folders that should not show up in the created package
-            - README.md
-            - .travis.yml
-            - .git
-        tarball: # Directories that should be tarballed themselves
-            - templates
-            - files
-            - acpTemplates: acptemplate
-            # You can also specify that the source and destination name
-            # should be different: "acpTemplates" gets tarballed into "acptemplate.tar"
+#### `--pip [name=file]`
+wspackager works by analyzing your `package.xml` file and the install instructions in it. If using WSC3, you can omit file- or folder names if these are the same as the PIPs default value. This does not work if your package relies on any 3rd party PIPs and uses their default values. In that case, you need to specify these PIPs and their default values.
+
+**Example**
+```xml
+<instruction type="template" /> <!-- This is understood, as it's a default PIP -->
+<instruction type="banana" /> <!-- This is a 3rd party PIP -->
 ```
-You can also specify that you want to run multiple package tasks like so:
-```yaml
-package:
-    -
-        destination: com.example.plugin.1.tar
-        base: plugin-1
-        files:
-            # ...
-    -
-        destination: com.example.plugin.2.tar
-        base: plugin-2
-        files:
-            # ...
+If the default value of the `banana` PIP was `banana.xml` or `banana.tar` you would need to run the program like so respectively:
+```sh
+$ wspackager --pip banana=banana.xml
+$ wspackager --pip banana=banana.tar
 ```
-This example would not use the current working directory as its base path, but the manually specified `base` (can also be absolute).
+In case you use multiple 3rd party PIPs, you can also stack this parameter like so:
+`wspackager --pip banana=banana.xml --pip foo=bar.xml`
