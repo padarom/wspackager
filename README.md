@@ -4,13 +4,13 @@ A small library that handles WCF/WSC packaging for you. It automatically analyse
 ## Installation and Usage
 Run `npm install -g wspackager` to install the package globally and have its binary added to your PATH.
 
-Once installed, simply run `wspackager`.
+Once installed, simply run `wspackager` in the same folder that your packages `package.xml` is at.
 
 ## Options
 There's several options you can run this program with, which shall be listed below.
 
 #### `--pretend` (`-p`)
-wspackager simply outputs the resulting package structure, but don't actually performs the packaging. You can use this to test whether your application is going to be correctly packaged beforehand.
+wspackager simply outputs the resulting package structure, but doesn't actually perform the packaging. You can use this to test whether your application is going to be correctly packaged beforehand.
 
 #### `--gzip` (`-g`)
 The default archive format used is `.tar`. You can use this option if you want or need to package to a `.tar.gz` archive instead.
