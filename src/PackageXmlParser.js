@@ -1,5 +1,3 @@
-'use strict';
-
 var prototype = PackageXmlParser.prototype;
 
 var xml2js = require('xml2js'),

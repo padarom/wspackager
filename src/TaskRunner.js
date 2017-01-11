@@ -1,5 +1,3 @@
-'use strict';
-
 var PackageXmlParser = require('./PackageXmlParser');
 
 import fs from 'fs'

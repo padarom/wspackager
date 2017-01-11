@@ -1,5 +1,3 @@
-'use strict';
-
 var prototype = PipParser.prototype;
 
 function PipParser(additionalPips) {
