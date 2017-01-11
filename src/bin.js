@@ -2,7 +2,8 @@
 
 'use strict';
 
-const program = require('commander');
+import TaskRunner from './TaskRunner'
+import program from 'commander'
 
 var collectPips = function (value, list) {
     var splitted = value.split('=');
@@ -22,7 +23,6 @@ program
     var pretend = program.pretend ? program.pretend : false;
     var gzip  = program.gzip ? program.gzip : false;
 
-    var TaskRunner = require('./TaskRunner');
     var taskRunner = new TaskRunner({
         pretend: pretend,
         gzip: gzip,

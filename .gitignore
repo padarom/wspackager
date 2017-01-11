@@ -6,3 +6,6 @@ build
 *.orig
 .idea
 sandbox
+
+lib/*
+!lib/.gitkeep
