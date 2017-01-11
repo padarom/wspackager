@@ -1,15 +1,9 @@
-var prototype = PipParser.prototype;
-
-function PipParser(additionalPips) {
-    this.additionalPips = additionalPips;
-}
-
 /**
  * A list of all PIPs shipped with WSC and their default file names.
  *
  * @see {@link https://github.com/WoltLab/WCF/tree/master/wcfsetup/install/files/lib/system/package/plugin}
  */
-prototype.DEFAULT_PIP_FILENAMES = {
+const DEFAULT_PIP_FILENAMES = {
     aclOption: 'aclOption.xml',
     acpMenu: 'acpMenu.xml',
     acpSearchProvider: 'acpSearchProvider.xml',
@@ -39,39 +33,39 @@ prototype.DEFAULT_PIP_FILENAMES = {
     userOption: null,
     userProfileMenu: null,
     userNotificationEvent: null,
-};
-
-prototype.run = function(instructions)
-{
-    var that = this;
-    var pips = this.getPipList();
-
-    return instructions.map(function (it) {
-        return that.getFileName(it, pips);
-    });
 }
 
-prototype.getPipList = function()
+export default class PipParser
 {
-    var pipList = this.DEFAULT_PIP_FILENAMES;
-    for (var pip in this.additionalPips) {
-        pipList[pip] = this.additionalPips[pip];
+    constructor(additionalPips) {
+        this.additionalPips = additionalPips
     }
 
-    return pipList;
+    run(instructions) {
+        var that = this
+        var pips = this.getPipList()
+
+        return instructions.map(it => that.getFileName(it, pips))
+    }
+
+    getPipList() {
+        var pipList = DEFAULT_PIP_FILENAMES
+        for (var pip in this.additionalPips) {
+            pipList[pip] = this.additionalPips[pip]
+        }
+
+        return pipList
+    }
+
+    getFileName(instruction, pips) {
+        if (instruction.path) {
+            return instruction.path
+        }
+
+        if (pips[instruction.type]) {
+            return pips[instruction.type]
+        }
+
+        throw new Error('No default filename was provided for the PIP "' + instruction.type + '"')
+    }
 }
-
-prototype.getFileName = function(instruction, pips)
-{
-    if (instruction.path) {
-        return instruction.path;
-    }
-
-    if (pips[instruction.type]) {
-        return pips[instruction.type];
-    }
-
-    throw new Error('No default filename was provided for the PIP "' + instruction.type + '"');
-}
-
-module.exports = PipParser;

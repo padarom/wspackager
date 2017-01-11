@@ -3,10 +3,10 @@
 import TaskRunner from './TaskRunner'
 import program from 'commander'
 
-var collectPips = function (value, list) {
-    var splitted = value.split('=');
-    list[splitted[0]] = splitted[1];
-    return list;
+let collectPips = function (value, list) {
+    var splitted = value.split('=')
+    list[splitted[0]] = splitted[1]
+    return list
 }
 
 program
@@ -18,17 +18,15 @@ program
     .parse(process.argv);
 
 (function(program) {
-    var pretend = program.pretend ? program.pretend : false;
-    var gzip  = program.gzip ? program.gzip : false;
+    var pretend = program.pretend ? program.pretend : false
+    var gzip  = program.gzip ? program.gzip : false
 
-    var taskRunner = new TaskRunner({
+    // Run the program.
+    new TaskRunner({
         pretend: pretend,
         gzip: gzip,
         pips: program.pip,
         quiet: program.quiet,
         cwd: process.cwd()
-    });
-
-    // Run the program.
-    taskRunner.run();
-})(program);
+    }).run()
+})(program)

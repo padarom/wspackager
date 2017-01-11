@@ -1,8 +1,7 @@
-var PackageXmlParser = require('./PackageXmlParser');
-
 import fs from 'fs'
 import async from 'async'
 import Packager from './Packager'
+import PackageXmlParser from './PackageXmlParser'
 
 export default class TaskRunner
 {

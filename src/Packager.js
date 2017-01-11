@@ -1,6 +1,6 @@
-var fs = require('fs'),
-    tar = require('tar'),
-    del = require('del');
+import fs from 'fs'
+import tar from 'tar'
+import del from 'del'
 
 export default class Packager
 {

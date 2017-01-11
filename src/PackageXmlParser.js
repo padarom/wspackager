@@ -1,81 +1,77 @@
-var prototype = PackageXmlParser.prototype;
+import fs from 'fs'
+import async from 'async'
+import xml2js from 'xml2js'
+import PipParser from './PipParser'
 
-var xml2js = require('xml2js'),
-    fs     = require('fs'),
-    async  = require('async'),
-    PipParser = require('./PipParser');
+export default class PackageXmlParser
+{
+    parse(runner, done) {
+        var that = this
 
-function PackageXmlParser() {
+        this.pips = runner.options.pips
 
-}
+        async.series([
+            callback => that.readXml(callback),
+            callback => that.parseInfo(callback),
+            callback => that.parsePips(callback)
+        ], function() {
+            runner.filesToPackage = that.filesToPackage
+            done(null, null)
+        })
+    }
 
-prototype.parse = function(runner, done) {
-    var that = this;
+    readXml(callback) {
+        var that = this
 
-    this.pips = runner.options.pips;
+        fs.readFile('package.xml', function(err, data) {
+            var parser = new xml2js.Parser()
 
-    async.series([
-        function(callback) { that.readXml(callback) },
-        function(callback) { that.parseInfo(callback) },
-        function(callback) { that.parsePips(callback) }
-    ], function () {
-        runner.filesToPackage = that.filesToPackage;
-        done(null, null);
-    });
-}
+            if (err) {
+                return callback(new Error("The package.xml could not be read."))
+            }
 
-prototype.readXml = function(callback) {
-    var that = this;
+            parser.parseString(data, function (err, result) {
+                 if (err) {
+                     return callback(new Error("The package.xml does not appear to be a valid XML document."))
+                 }
 
-    fs.readFile('package.xml', function(err, data) {
-        var parser = new xml2js.Parser();
+                 that.xml = result
+                 callback(null, null)
+            })
+        })
+    }
 
-        if (err) {
-            return callback(new Error("The package.xml could not be read."));
+    parseInfo(callback) {
+        var pack = this.xml.package
+        var info = {
+            name: pack['$'].name,
+            author: pack.authorinformation[0].author[0],
+            version: pack.packageinformation[0].version[0]
         }
 
-        parser.parseString(data, function (err, result) {
-             if (err) {
-                 return callback(new Error("The package.xml does not appear to be a valid XML document."));
-             }
+        this.info = info
 
-             that.xml = result;
-             callback(null, null);
-        });
-    });
+        callback(null, null)
+
+    }
+
+    parsePips(callback) {
+        var instructions = []
+        this.xml.package.instructions.forEach(function (element) {
+            var instruction = element.instruction
+            instruction.forEach(function (element) {
+                instructions.push({
+                    type: element.$.type,
+                    path: element._
+                })
+            })
+        })
+
+        var parser = new PipParser(this.pips)
+        var fileList = parser.run(instructions)
+
+        this.filesToPackage = fileList
+
+        callback(null, null)
+    }
 }
-
-prototype.parseInfo = function(callback) {
-    var pack = this.xml.package;
-    var info = {
-        name: pack['$'].name,
-        author: pack.authorinformation[0].author[0],
-        version: pack.packageinformation[0].version[0]
-    };
-
-    this.info = info;
-
-    callback(null, null);
-}
-
-prototype.parsePips = function(callback) {
-    var instructions = [];
-    this.xml.package.instructions.forEach(function (element) {
-        var instruction = element.instruction;
-        instruction.forEach(function (element) {
-            instructions.push({
-                type: element.$.type,
-                path: element._
-            });
-        });
-    });
-
-    var parser = new PipParser(this.pips);
-    var fileList = parser.run(instructions);
-
-    this.filesToPackage = fileList;
-
-    callback(null, null);
-}
-
-module.exports = PackageXmlParser;
