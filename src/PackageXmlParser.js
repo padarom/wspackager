@@ -6,22 +6,22 @@ import PipParser from './PipParser'
 export default class PackageXmlParser
 {
     parse(runner, done) {
-        var that = this
-
+        let that = this
         this.pips = runner.options.pips
 
         async.series([
-            callback => that.readXml(callback),
-            callback => that.parseInfo(callback),
-            callback => that.parsePips(callback)
+            cb => this.readXml(cb),
+            cb => this.parseInfo(cb),
+            cb => this.parsePips(cb)
         ], function() {
             runner.filesToPackage = that.filesToPackage
+            runner.xmlInfo = that.info
             done(null, null)
         })
     }
 
     readXml(callback) {
-        var that = this
+        let that = this
 
         fs.readFile('package.xml', function(err, data) {
             var parser = new xml2js.Parser()

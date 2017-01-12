@@ -42,16 +42,17 @@ export default class PipParser
     }
 
     run(instructions) {
-        var that = this
         var pips = this.getPipList()
 
-        return instructions.map(it => that.getFileName(it, pips))
+        return instructions.map(it => this.getFileName(it, pips))
     }
 
     getPipList() {
+        let that = this
+        
         var pipList = DEFAULT_PIP_FILENAMES
         for (var pip in this.additionalPips) {
-            pipList[pip] = this.additionalPips[pip]
+            pipList[pip] = that.additionalPips[pip]
         }
 
         return pipList

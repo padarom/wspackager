@@ -4,8 +4,8 @@
   "description": "A small application that handles WCF/WSC packaging for you. Previously known as \"wcfutils\"",
   "main": "lib/packager.js",
   "scripts": {
-      "compile": "babel --presets es2015 -d lib/ src/",
-      "prepublish": "npm run compile"
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,10 @@
   "homepage": "https://github.com/padarom/wspackager#readme",
   "dependencies": {
     "async": "^2.1.4",
+    "chalk": "^1.1.3",
     "commander": "^2.9.0",
     "del": "^2.2.2",
+    "glob": "^7.1.1",
     "tar": "^2.2.1",
     "xml2js": "^0.4.17"
   },

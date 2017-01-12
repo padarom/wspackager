@@ -11,13 +11,13 @@ export default class TaskRunner
     }
 
     run() {
-        var that = this
+        let that = this
 
         // Run the following instructions in series.
         async.series([
-            (callback) => that.doesPackageXmlExist(callback),
-            (callback) => that.readAndParseFile(callback),
-            (callback) => that.runPackager(callback),
+            cb => that.doesPackageXmlExist(cb),
+            cb => that.readAndParseFile(cb),
+            cb => that.runPackager(cb),
         ], this.done)
     }
 
@@ -44,7 +44,7 @@ export default class TaskRunner
     }
 
     runPackager(callback) {
-        var packager = new Packager()
-        packager.run(this.filesToPackage, callback, this.options.pretend)
+        var packager = new Packager(this.filesToPackage, this.xmlInfo)
+        packager.run(callback, this.options.pretend)
     }
 }
