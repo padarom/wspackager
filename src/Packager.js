@@ -10,8 +10,12 @@ const log = console.log
 export default class Packager
 {
     constructor(files, packageInfo) {
-        this.filesToPackage = files
         this.packageInfo = packageInfo
+
+        // Remove duplicates from array
+        this.filesToPackage = files.filter(
+            (el, i, arr) => arr.indexOf(el) === i
+        )
     }
 
     run(done, pretend) {
