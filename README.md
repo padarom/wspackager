@@ -1,4 +1,4 @@
-# WoltLab Suite Packager
+# WoltLab Suite Packager [![npm](https://img.shields.io/npm/v/wspackager.svg?style=flat-square)](https://www.npmjs.com/package/wspackager)  [![npm](https://img.shields.io/npm/dt/wspackager.svg?style=flat-square)](https://www.npmjs.com/package/wspackager)
 A small library that handles WCF/WSC packaging for you. It automatically analyses the instructions in your `package.xml` to determine which files to package. You won't need to create any additional configuration files or adjust the way you work. Simply follow some very basic guidelines and run the program.
 
 ## Installation and Usage
@@ -10,6 +10,14 @@ Once installed, simply run `wspackager` in the same folder that your packages `p
 `wspackager` will analyze your `package.xml` to only package files that are required for your specified instructions. In cases where the instruction asks for a `.tar` archive it is assumed that you have a folder with the same name in your projects root directory (e.g. if you're using the instruction `<instruction type="file">files.tar</instruction>` it will attempt to package the folder `files` to make `files.tar`).
 
 If a file you specified in your instructions does not exist, the program will exit and alert you.
+
+## Why choose this one over other packagers?
+- No configuration required
+- Folder structure independent (_no need to adjust your workflow_)
+- Plugin-aware packaging (_it only packages what your package instructions need_)
+- Compatible with WSC3.0 and default PIP filenames
+- Almost 1300 downloads of the predecessor packages [wcfutils](https://www.npmjs.com/package/wcfutils) and [wcf-utils](https://www.npmjs.com/package/wcf-utils) on npm
+- Doesn't require user-interaction and works well for CI (_visit the [Wiki](https://github.com/padarom/wspackager/wiki) for an example setup_)
 
 ## Options
 There's several options you can run this program with, which shall be listed below.
