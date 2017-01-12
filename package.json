@@ -1,6 +1,6 @@
 {
   "name": "wspackager",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A small application that handles WCF/WSC packaging for you. Previously known as \"wcfutils\"",
   "main": "lib/packager.js",
   "scripts": {
