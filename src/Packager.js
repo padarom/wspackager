@@ -93,7 +93,7 @@ export default class Packager
                 prepack, direct
             }
 
-            done(null, null)
+            done()
         })
     }
 
@@ -106,16 +106,16 @@ export default class Packager
                 let packer = tar.Pack({ noProprietary: true, fromBase: true })
                 let writeStream = fs.createWriteStream(dir + '.tar')
 
-                packer.on('error', err => cb(err, null))
-                    .on('end', () => cb(null, null))
+                packer.on('error', err => cb(err))
+                    .on('end', () => cb())
                 fstream.Reader({ path: dir, type: 'Directory'})
-                    .on('error', that.pathDoesNotExist)
+                    .on('error', done)
                     .pipe(packer)
                     .pipe(writeStream)
             })
         }
 
-        async.parallel(tasks, err => done(err, null))
+        async.parallel(tasks, err => done(err))
     }
 
     packageAll(done) {
@@ -125,7 +125,7 @@ export default class Packager
         let streams = []
         let files = this.packagingPlan.direct.concat(
             this.packagingPlan.prepack.map(item => item + '.tar')
-        )
+        ).map(item => item.replace('/', path.sep)) // Windows compatibility
 
         var folders = []
         files.forEach(dir => {
@@ -156,22 +156,18 @@ export default class Packager
         readStream
             .pipe(packer)
             .pipe(fs.createWriteStream(that.packageInfo.name + '.tar'))
-            .on('finish', () => done(null, null))
+            .on('finish', () => done())
     }
 
     cleanup(done) {
         del(this.packagingPlan.prepack.map(i => i + '.tar')).then(paths => {
-            done(null, null)
+            done()
         })
-    }
-
-    pathDoesNotExist(error) {
-        console.log(error)
     }
 
     writeTreeStructure(quiet, done) {
         if (quiet)
-            return done(null, null)
+            return done()
 
         let that = this
         var tree = {}
@@ -184,6 +180,6 @@ export default class Packager
         console.log(chalk.bold.green(this.packageInfo.name + '.tar'))
         outputTree(tree)
 
-        done(null, null)
+        done()
     }
 }

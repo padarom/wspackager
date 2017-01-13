@@ -16,7 +16,7 @@ export default class PackageXmlParser
         ], function() {
             runner.filesToPackage = that.filesToPackage
             runner.xmlInfo = that.info
-            done(null, null)
+            done()
         })
     }
 
@@ -36,7 +36,7 @@ export default class PackageXmlParser
                  }
 
                  that.xml = result
-                 callback(null, null)
+                 callback()
             })
         })
     }
@@ -51,7 +51,7 @@ export default class PackageXmlParser
 
         this.info = info
 
-        callback(null, null)
+        callback()
 
     }
 
@@ -72,6 +72,6 @@ export default class PackageXmlParser
 
         this.filesToPackage = fileList
 
-        callback(null, null)
+        callback()
     }
 }
