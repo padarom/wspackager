@@ -1,11 +1,12 @@
-import fs from 'fs'
+import { buildTree, outputTree } from './TreeBuilder'
+import fstream from 'fstream'
+import chalk from 'chalk'
+import async from 'async'
+import glob from 'glob'
+import path from 'path'
 import tar from 'tar'
 import del from 'del'
-import glob from 'glob'
-import async from 'async'
-import chalk from 'chalk'
-
-const log = console.log
+import fs from 'fs'
 
 export default class Packager
 {
@@ -19,15 +20,23 @@ export default class Packager
     }
 
     run(done, quiet) {
-        let that = this
-
         async.series([
             cb => this.findLocalFiles(cb),
-            cb => this.outputIfNecessary(quiet, cb)
-        ], () => {
-            done(null, null)
-        })
+            cb => this.writeTreeStructure(quiet, cb),
+            cb => this.prepackage(cb),
+            cb => this.packageAll(cb),
+            cb => this.cleanup(cb),
+            cb => this.getFileStats(cb),
+        ], (err, results) => {
+            let filesize = results.pop()
 
+            if (!quiet) {
+                console.log('-> ' + chalk.green.bold('Package generated')
+                    + ' (' + filesize + ')')
+            }
+
+            done(err, results)
+        })
     }
 
     getFileProcessingList() {
@@ -49,6 +58,19 @@ export default class Packager
                     callback(err, item)
                 })
             }
+        })
+    }
+
+    getFileStats(done) {
+        fs.stat(this.packageInfo.name + '.tar', (err, stats) => {
+            function bytesToSize(bytes) {
+               var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+               if (bytes == 0) return '0 Byte';
+               var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+               return Math.round(bytes / Math.pow(1000, i), 2) + ' ' + sizes[i];
+            };
+
+            done(err, bytesToSize(stats.size))
         })
     }
 
@@ -75,72 +97,93 @@ export default class Packager
         })
     }
 
-    outputIfNecessary(quiet, done) {
+    prepackage(done) {
+        let that = this
+        let tasks = []
+
+        for (let dir of this.packagingPlan.prepack) {
+            tasks.push(cb => {
+                let packer = tar.Pack({ noProprietary: true, fromBase: true })
+                let writeStream = fs.createWriteStream(dir + '.tar')
+
+                packer.on('error', err => cb(err, null))
+                    .on('end', () => cb(null, null))
+                fstream.Reader({ path: dir, type: 'Directory'})
+                    .on('error', that.pathDoesNotExist)
+                    .pipe(packer)
+                    .pipe(writeStream)
+            })
+        }
+
+        async.parallel(tasks, err => done(err, null))
+    }
+
+    packageAll(done) {
+        let that = this
+        let packer = tar.Pack({ noProprietary: true, fromBase: true })
+
+        let streams = []
+        let files = this.packagingPlan.direct.concat(
+            this.packagingPlan.prepack.map(item => item + '.tar')
+        )
+
+        var folders = []
+        files.forEach(dir => {
+            var base = path.dirname(dir)
+            let dirs = [base]
+            while (base.includes('/')) {
+                base = path.dirname(base)
+                dirs.push(base)
+            }
+            folders = folders.concat(dirs)
+        })
+
+        folders = folders.filter(
+            (el, i, arr) => arr.indexOf(el) === i
+        )
+
+        let readStream = fstream.Reader({
+            path: process.cwd(),
+            filter: function (entry) {
+                // Remove path up to cwd
+                let file = entry.path.replace(process.cwd() + path.sep, '')
+                return (file == process.cwd()
+                    || folders.indexOf(file) !== -1
+                    || files.indexOf(file) !== -1)
+            }
+        })
+
+        readStream
+            .pipe(packer)
+            .pipe(fs.createWriteStream(that.packageInfo.name + '.tar'))
+            .on('finish', () => done(null, null))
+    }
+
+    cleanup(done) {
+        del(this.packagingPlan.prepack.map(i => i + '.tar')).then(paths => {
+            done(null, null)
+        })
+    }
+
+    pathDoesNotExist(error) {
+        console.log(error)
+    }
+
+    writeTreeStructure(quiet, done) {
         if (quiet)
             return done(null, null)
 
         let that = this
         var tree = {}
         this.packagingPlan.direct.forEach(file => {
-            tree = that.buildTree(tree, file)
+            tree = buildTree(tree, file)
         })
 
         tree._.push(...this.packagingPlan.prepack.map(i => i + '.tar'))
 
-        log(chalk.bold.green(this.packageInfo.name + '.tar'))
-        this.outputTree(tree)
-    }
+        console.log(chalk.bold.green(this.packageInfo.name + '.tar'))
+        outputTree(tree)
 
-    buildTree(tree, item) {
-        if (!tree._) tree._ = []
-
-        if (!item.includes('/')) tree._.push(item)
-        else {
-            let i = item.indexOf('/')
-            let end = item.slice(i + 1)
-            let folder = item.slice(0, i)
-
-            if (!tree[folder]) tree[folder] = {}
-            tree[folder] = this.buildTree(tree[folder], end)
-        }
-
-        return tree
-    }
-
-    outputTree(tree, level=0, levelsDone=[]) {
-        let files =
-            tree._
-                .concat(Object.keys(tree)
-                .filter(i => i != '_'))
-                .sort()
-
-        files.forEach((item, key) => {
-            let isFolder = tree.hasOwnProperty(item)
-            let isLastEntry = key == files.length - 1
-
-            // The symbol to display.
-            // This is different for items in the middle and at the end of a list
-            let symbol = isLastEntry ? '└' : '├'
-
-            // The prefix for this level.
-            var prefix = '';
-            for (let i = 0; i < level; i++) {
-                prefix += levelsDone.indexOf(i) != -1 ? '    ' : '│   '
-            }
-
-            // The item itself.
-            let itemText = (isFolder ? chalk.bold(item) : (item.endsWith('.tar') ? chalk.bold.cyan(item) : item))
-
-            // Log the item
-            log(prefix + symbol + '── ' + itemText)
-
-            // If the item was a folder, go over its files as well.
-            if (isFolder) {
-                if (isLastEntry) {
-                    levelsDone.push(level)
-                }
-                this.outputTree(tree[item], level + 1, levelsDone)
-            }
-        })
+        done(null, null)
     }
 }
