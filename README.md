@@ -6,7 +6,7 @@ Run `npm install -g wspackager` to install the package globally and have its bin
 
 Once installed, simply run `wspackager` in the same folder that your packages `package.xml` is at.
 
-![Tree diagram](/assets/tree.png?raw=true "Tree diagram of your plugin")
+![Tree diagram](/assets/tree-2.png?raw=true "Tree diagram of your plugin")
 
 ### Project structure
 `wspackager` will analyze your `package.xml` to only package files that are required for your specified instructions. In cases where the instruction asks for a `.tar` archive it is assumed that you have a folder with the same name in your projects root directory (e.g. if you're using the instruction `<instruction type="file">files.tar</instruction>` it will attempt to package the folder `files` to make `files.tar`).
