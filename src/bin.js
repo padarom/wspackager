@@ -18,13 +18,9 @@ program
     .parse(process.argv);
 
 (function(program) {
-    var pretend = program.pretend ? program.pretend : false
-    var gzip  = program.gzip ? program.gzip : false
-
     // Run the program.
     new TaskRunner({
-        pretend: pretend,
-        gzip: gzip,
+        gzip: program.gzip,
         pips: program.pip,
         quiet: program.quiet,
         cwd: process.cwd()

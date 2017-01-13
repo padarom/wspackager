@@ -45,6 +45,6 @@ export default class TaskRunner
 
     runPackager(callback) {
         var packager = new Packager(this.filesToPackage, this.xmlInfo)
-        packager.run(callback, this.options.pretend)
+        packager.run(callback, this.options.quiet)
     }
 }

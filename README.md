@@ -6,6 +6,8 @@ Run `npm install -g wspackager` to install the package globally and have its bin
 
 Once installed, simply run `wspackager` in the same folder that your packages `package.xml` is at.
 
+![Tree diagram](/assets/tree.png?raw=true "Tree diagram of your plugin")
+
 ### Project structure
 `wspackager` will analyze your `package.xml` to only package files that are required for your specified instructions. In cases where the instruction asks for a `.tar` archive it is assumed that you have a folder with the same name in your projects root directory (e.g. if you're using the instruction `<instruction type="file">files.tar</instruction>` it will attempt to package the folder `files` to make `files.tar`).
 
@@ -21,11 +23,6 @@ If a file you specified in your instructions does not exist, the program will ex
 
 ## Options
 There's several options you can run this program with, which shall be listed below.
-
-#### `--pretend` (`-p`)
-wspackager simply outputs the resulting package structure, but doesn't actually perform the packaging. You can use this to test whether your application is going to be correctly packaged beforehand.
-
-![Tree diagram](/assets/tree.png?raw=true "Tree diagram of your plugin")
 
 #### `--gzip` (`-g`)
 The default archive format used is `.tar`. You can use this option if you want or need to package to a `.tar.gz` archive instead.
@@ -45,3 +42,6 @@ $ wspackager --pip banana=banana.tar
 ```
 In case you use multiple 3rd party PIPs, you can also stack this parameter like so:
 `wspackager --pip banana=banana.xml --pip foo=bar.xml`
+
+#### `--quiet` (`-q`)
+wspackager normally outputs the resulting package structure so you can verify your package has the content it should have without unpacking it. If you don't want the program to output anything, use the quiet option.

@@ -18,12 +18,12 @@ export default class Packager
         )
     }
 
-    run(done, pretend) {
+    run(done, quiet) {
         let that = this
 
         async.series([
             cb => this.findLocalFiles(cb),
-            cb => this.outputIfNecessary(pretend, cb)
+            cb => this.outputIfNecessary(quiet, cb)
         ], () => {
             done(null, null)
         })
@@ -75,9 +75,9 @@ export default class Packager
         })
     }
 
-    outputIfNecessary(pretend, done) {
-        if (!pretend)
-            done(null, null)
+    outputIfNecessary(quiet, done) {
+        if (quiet)
+            return done(null, null)
 
         let that = this
         var tree = {}
