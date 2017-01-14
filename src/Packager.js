@@ -85,7 +85,9 @@ export default class Packager
                 if (instruction.original.endsWith('.tar')) {
                     prepack = prepack.concat(instruction.paths)
                 } else {
-                    direct = direct.concat(instruction.paths)
+                    direct = direct.concat(
+                        instruction.paths.map(i => i.replace(/\.tar@$/, '.tar'))
+                    )
                 }
             })
 

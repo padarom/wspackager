@@ -13,6 +13,8 @@ Once installed, simply run `wspackager` in the same folder that your packages `p
 
 If a file you specified in your instructions does not exist, the program will exit and alert you. However it is **not** case-sensitive, meaning it will find `acpTemplates` just as well as `acptemplates`.
 
+If you specified any optional packages or filenames for required packages, it will attempt to add these to your final package as well.
+
 ## Why choose this one over other packagers?
 - No configuration required
 - Folder structure independent (_no need to adjust your workflow_)

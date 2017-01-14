@@ -12,7 +12,8 @@ export default class PackageXmlParser
         async.series([
             cb => this.readXml(cb),
             cb => this.parseInfo(cb),
-            cb => this.parsePips(cb)
+            cb => this.parsePips(cb),
+            cb => this.parseAdditionalPackages(cb),
         ], function() {
             runner.filesToPackage = that.filesToPackage
             runner.xmlInfo = that.info
@@ -71,6 +72,32 @@ export default class PackageXmlParser
         var fileList = parser.run(instructions)
 
         this.filesToPackage = fileList
+
+        callback()
+    }
+
+    parseAdditionalPackages(callback) {
+        var packages = []
+
+        var optionals = this.xml.package.optionalpackages
+        var requireds = this.xml.package.requiredpackages
+
+        let addPackagePaths = paths => {
+            for (let path of paths) {
+                var query = []
+                if (path.requiredpackage) query = path.requiredpackage
+                if (path.optionalpackage) query = path.optionalpackage
+
+                for (let pack of query) {
+                    if (pack.$.file) packages.push(pack.$.file + '@')
+                }
+            }
+        }
+
+        if (optionals) addPackagePaths(optionals)
+        if (requireds) addPackagePaths(requireds)
+
+        this.filesToPackage = this.filesToPackage.concat(packages)
 
         callback()
     }
