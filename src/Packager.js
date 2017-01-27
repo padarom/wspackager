@@ -127,13 +127,13 @@ export default class Packager
         let streams = []
         let files = this.packagingPlan.direct.concat(
             this.packagingPlan.prepack.map(item => item + '.tar')
-        ).map(item => item.replace('/', path.sep)) // Windows compatibility
+        ).map(item => item.replace(path.sep, '/')) // Windows compatibility
 
         var folders = []
         files.forEach(dir => {
             var base = path.dirname(dir)
             let dirs = [base]
-            while (base.includes('/')) {
+            while (base.includes('/') || base.includes('\\')) {
                 base = path.dirname(base)
                 dirs.push(base)
             }
@@ -148,8 +148,8 @@ export default class Packager
             path: process.cwd(),
             filter: function (entry) {
                 // Remove path up to cwd
-                let file = entry.path.replace(process.cwd() + path.sep, '')
-                return (file == process.cwd()
+                let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
+                return (file == process.cwd().replace(path.sep, '/')
                     || folders.indexOf(file) !== -1
                     || files.indexOf(file) !== -1)
             }
