@@ -1,4 +1,4 @@
-## **v1.0.5** (2017-01-27)
+## **v1.0.5** (2017-01-27) (+ **v1.0.6**)
 - Fixed a bug where folders wouldn't be packaged on Windows
 
 ## **v1.0.3** (2017-01-14)

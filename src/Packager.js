@@ -149,7 +149,7 @@ export default class Packager
             filter: function (entry) {
                 // Remove path up to cwd
                 let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
-                return (file == process.cwd().replace(path.sep, '/')
+                return (file == process.cwd().replace(/\\/g, '/')
                     || folders.indexOf(file) !== -1
                     || files.indexOf(file) !== -1)
             }
@@ -158,7 +158,7 @@ export default class Packager
         readStream
             .pipe(packer)
             .pipe(fs.createWriteStream(that.packageInfo.name + '.tar'))
-            .on('finish', () => done())
+            .on('finish', () => done() )
     }
 
     cleanup(done) {
