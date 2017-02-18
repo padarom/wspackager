@@ -19,7 +19,7 @@ const DEFAULT_PIP_FILENAMES = {
     menu: 'menu.xml',
     menuitem: 'menuitem.xml',
     objectType: 'objectType.xml',
-    objectTypeDefinition: null,
+    objectTypeDefinition: 'objectTypeDefinition.xml',
     option: 'option.xml',
     page: 'page.xml',
     pip: 'packageInstallationPlugin.xml',
