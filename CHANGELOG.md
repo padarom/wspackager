@@ -1,3 +1,6 @@
+## **v1.2.1** (2017-03-18)
+- Fix bug where `style.xml` file options with attributes weren't loaded
+
 ## **v1.2.0** (2017-03-18)
 - Add support for intermediate packages that should not be packaged into the final archive (only via styles)
 - Extend support for the `style` PIP that also reads the `style.xml` and packages its files as well

@@ -100,7 +100,9 @@ export default class PackageXmlParser
                      // Only one files section should be parsed
                      for (var file in result.style.files[0]) {
                          if (file == 'templates' || file == 'images') {
-                             additionalPackages.push({path: path + '/' + result.style.files[0][file], intermediate: true})
+                             let tag = result.style.files[0][file][0]
+                             let filename = typeof tag === 'object' ? tag._ : tag
+                             additionalPackages.push({path: path + '/' + filename, intermediate: true})
                          }
                      }
                  }
