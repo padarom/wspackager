@@ -68,12 +68,47 @@ export default class PackageXmlParser
             })
         })
 
-        var parser = new PipParser(this.pips)
-        var fileList = parser.run(instructions)
+        let parser = new PipParser(this.pips)
+        let list = parser.run(instructions)
 
-        this.filesToPackage = fileList
+        this.filesToPackage = list.files.map(it => { return {path: it, intermediate: false} })
 
-        callback()
+        if (list.styles) {
+            this.parseStyleXML(list.styles[0], callback)
+        } else {
+            callback()
+        }
+    }
+
+    parseStyleXML(path, callback) {
+        let that = this
+
+        fs.readFile(path + '/style.xml', function(err, data) {
+            var parser = new xml2js.Parser()
+
+            if (err) {
+                return callback(new Error("The style.xml could not be read."))
+            }
+
+            parser.parseString(data, function (err, result) {
+                 if (err) {
+                     return callback(new Error("The style.xml does not appear to be a valid XML document."))
+                 }
+
+                 var additionalPackages = [];
+                 if (result.style.files) {
+                     // Only one files section should be parsed
+                     for (var file in result.style.files[0]) {
+                         if (file == 'templates' || file == 'images') {
+                             additionalPackages.push({path: path + '/' + result.style.files[0][file], intermediate: true})
+                         }
+                     }
+                 }
+
+                 that.filesToPackage = that.filesToPackage.concat(additionalPackages)
+                 callback()
+            })
+        })
     }
 
     parseAdditionalPackages(callback) {
@@ -97,6 +132,7 @@ export default class PackageXmlParser
         if (optionals) addPackagePaths(optionals)
         if (requireds) addPackagePaths(requireds)
 
+        packages = packages.map(it => { return {path: it, intermediate: false} })
         this.filesToPackage = this.filesToPackage.concat(packages)
 
         callback()

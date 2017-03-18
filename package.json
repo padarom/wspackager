@@ -1,7 +1,7 @@
 {
   "name": "wspackager",
   "description": "A small application that handles WCF/WSC packaging for you. Previously known as \"wcfutils\"",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "src/gulp/wspackager.js",
   "scripts": {
     "compile": "babel --presets es2015 -d lib/ src/",
@@ -27,6 +27,7 @@
     "del": "^2.2.2",
     "fstream": "^1.0.10",
     "glob": "^7.1.1",
+    "lodash": "^4.17.4",
     "tar": "^2.2.1",
     "xml2js": "^0.4.17"
   },

@@ -44,12 +44,27 @@ export default class PipParser
     run(instructions) {
         var pips = this.getPipList()
 
-        return instructions.map(it => this.getFileName(it, pips))
+        return {
+            files: instructions.map(it => this.getFileName(it, pips)),
+            styles: this.getStylePaths(instructions)
+        }
+    }
+
+    getStylePaths(pips) {
+        var result = []
+
+        for (var pip of pips) {
+            if (pip.type == 'style') {
+                result.push(pip.path.replace('.tar', ''))
+            }
+        }
+
+        return result
     }
 
     getPipList() {
         let that = this
-        
+
         var pipList = DEFAULT_PIP_FILENAMES
         for (var pip in this.additionalPips) {
             pipList[pip] = that.additionalPips[pip]

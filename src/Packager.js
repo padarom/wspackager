@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
 import path from 'path'
+import _ from 'lodash'
 import tar from 'tar'
 import del from 'del'
 import fs from 'fs'
@@ -13,10 +14,14 @@ export default class Packager
     constructor(files, packageInfo) {
         this.packageInfo = packageInfo
 
+        // Order by intermediate files
+        files.sort((a, b) => {
+            if (a.intermediate > b.intermediate) return -1;
+            else return 1;
+        })
+
         // Remove duplicates from array
-        this.filesToPackage = files.filter(
-            (el, i, arr) => arr.indexOf(el) === i
-        )
+        this.filesToPackage = _.uniqBy(files, 'path')
     }
 
     run(done, quiet) {
@@ -40,7 +45,9 @@ export default class Packager
     }
 
     getFileProcessingList() {
-        return this.filesToPackage.map(item => {
+        let files = this.filesToPackage.map(item => item.path)
+
+        return files.map(item => {
             return {
                 original: item,
                 adjusted: item.replace(/\.tar$/i, '')
@@ -110,14 +117,30 @@ export default class Packager
 
                 packer.on('error', err => cb(err))
                     .on('end', () => cb())
-                fstream.Reader({ path: dir, type: 'Directory'})
-                    .on('error', done)
+                fstream.Reader({
+                        path: dir, type: 'Directory',
+                        filter: function (entry) {
+                            let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
+                            return dir == file || !that.isIntermediateFile(file)
+                        }
+                    }).on('error', done)
                     .pipe(packer)
                     .pipe(writeStream)
             })
         }
 
-        async.parallel(tasks, err => done(err))
+        async.waterfall(tasks, err => done(err))
+    }
+
+    isIntermediateFile(name, omitTar) {
+        for (var file in this.filesToPackage) {
+            let filename = this.filesToPackage[file].path
+            if (filename == name + '.tar' || (omitTar && filename == name)) {
+                return this.filesToPackage[file].intermediate
+            }
+        }
+
+        return false
     }
 
     packageAll(done) {
@@ -131,6 +154,9 @@ export default class Packager
 
         var folders = []
         files.forEach(dir => {
+            // Don't include folders that only contain intermediate files
+            if (that.isIntermediateFile(dir, true)) return
+
             var base = path.dirname(dir)
             let dirs = [base]
             while (base.includes('/') || base.includes('\\')) {
@@ -149,7 +175,7 @@ export default class Packager
             filter: function (entry) {
                 // Remove path up to cwd
                 let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
-                return (file == process.cwd().replace(/\\/g, '/')
+                return !that.isIntermediateFile(file, true) && (file == process.cwd().replace(/\\/g, '/')
                     || folders.indexOf(file) !== -1
                     || files.indexOf(file) !== -1)
             }
@@ -177,7 +203,8 @@ export default class Packager
             tree = buildTree(tree, file)
         })
 
-        tree._.push(...this.packagingPlan.prepack.map(i => i + '.tar'))
+        let nonIntermediatePrepacks = this.packagingPlan.prepack.filter(it => !that.isIntermediateFile(it))
+        tree._.push(...nonIntermediatePrepacks.map(i => i + '.tar'))
 
         console.log(chalk.bold.green(this.packageInfo.name + '.tar'))
         outputTree(tree)

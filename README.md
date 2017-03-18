@@ -22,9 +22,28 @@ If you specified any optional packages or filenames for required packages, it wi
 - No configuration required
 - Folder structure independent (_no need to adjust your workflow_)
 - Plugin-aware packaging (_it only packages what your package instructions need_)
+- Supports packaging custom styles (parsing the `style.xml` and adding additional templates/images arhive)
 - Compatible with WSC3.0 and default PIP filenames
 - Almost 1300 downloads of the predecessor packages [wcfutils](https://www.npmjs.com/package/wcfutils) and [wcf-utils](https://www.npmjs.com/package/wcf-utils) on npm
 - Doesn't require user-interaction and works well for CI (_visit the [Wiki](https://github.com/padarom/wspackager/wiki) for an example setup_)
+
+## How to package styles
+Creating styles that support custom templates and images is a bit more complicated than a regular package, although it is essentially also just a package. You will still require a `package.xml` in your root directory, which has to include a `style` PIP. The tool will then read the `style.xml` in that path and package all additional files.
+
+`style/style.xml`:  
+```xml
+<style>
+    <!-- General options and author -->
+    <files>
+        <templates>templates.tar</templates>
+        <images>images.tar</images>
+    </files>
+</style>
+```
+
+With these options set in your style.xml wspackager will attempt to locate the directories `style/templates` and `style/images` and correctly add them to your `style.tar`. Templates in the `wcf` namespace then have to be in `style/templates/com.woltlab.wcf` and for the `wbb` namespace they have to be in `style/templates/com.woltlab.wbb`.
+
+**_Important:_ You have to make sure you only reference `.tar` archives in your package.xml and style.xml. `.tgz`/`.tar.gz` are currently not supported**.
 
 ## Options
 There's several options you can run this program with, which shall be listed below.

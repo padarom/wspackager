@@ -1,3 +1,7 @@
+## **v1.2.0** (2017-03-18)
+- Add support for intermediate packages that should not be packaged into the final archive (only via styles)
+- Extend support for the `style` PIP that also reads the `style.xml` and packages its files as well
+
 ## **v1.1.0** (2017-02-18)
 - Added additional default file names for XML based PIPs
 
