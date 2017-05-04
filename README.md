@@ -67,5 +67,7 @@ In case you use multiple 3rd party PIPs, you can also stack this parameter like 
 #### `--quiet` (`-q`)
 wspackager normally outputs the resulting package structure so you can verify your package has the content it should have without unpacking it. If you don't want the program to output anything, use the quiet option.
 
-#### `--gzip` (`-g`) _Not yet supported_
-The default archive format used is `.tar`. You can use this option if you want or need to package to a `.tar.gz` archive instead.
+#### `--destination [path]` (`-d`)
+Specifies a destination where the archive should be saved to. The default is the current working directory, which saves the file to `<packageidentifier>.tar`. You can specify an alternative destination using this option. The placeholders `{name}` and `{version}` will be replaced by the package identifier and version respectively. When using this option, you should always include the file extension `.tar`, as it will not automatically be added:
+
+`wspackager --destination '../build/{name}/{version}.tar'`

@@ -1,5 +1,6 @@
 import { buildTree, outputTree } from './TreeBuilder'
 import fstream from 'fstream'
+import shelljs from 'shelljs'
 import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
@@ -24,7 +25,9 @@ export default class Packager
         this.filesToPackage = _.uniqBy(files, 'path')
     }
 
-    run(done, quiet) {
+    run(done, destination, quiet) {
+        this.destination = destination
+
         async.series([
             cb => this.findLocalFiles(cb),
             cb => this.writeTreeStructure(quiet, cb),
@@ -69,7 +72,7 @@ export default class Packager
     }
 
     getFileStats(done) {
-        fs.stat(this.packageInfo.name + '.tar', (err, stats) => {
+        fs.stat(this.getDestinationPath(), (err, stats) => {
             function bytesToSize(bytes) {
                var sizes = ['Bytes', 'KB', 'MB', 'GB'];
                if (bytes == 0) return '0 Byte';
@@ -148,9 +151,10 @@ export default class Packager
         let packer = tar.Pack({ noProprietary: true, fromBase: true })
 
         let streams = []
+
         let files = this.packagingPlan.direct.concat(
             this.packagingPlan.prepack.map(item => item + '.tar')
-        ).map(item => item.replace(path.sep, '/')) // Windows compatibility
+        ).map(path.normalize) // Windows compatibility
 
         var folders = []
         files.forEach(dir => {
@@ -159,7 +163,7 @@ export default class Packager
 
             var base = path.dirname(dir)
             let dirs = [base]
-            while (base.includes('/') || base.includes('\\')) {
+            while (path.dirname(base) != '.') {
                 base = path.dirname(base)
                 dirs.push(base)
             }
@@ -174,17 +178,33 @@ export default class Packager
             path: process.cwd(),
             filter: function (entry) {
                 // Remove path up to cwd
-                let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
-                return !that.isIntermediateFile(file, true) && (file == process.cwd().replace(/\\/g, '/')
+                let file = path.relative(process.cwd(), entry.path)
+                return !that.isIntermediateFile(file, true) &&
+                    (!file // Zero-length-string = cwd
                     || folders.indexOf(file) !== -1
                     || files.indexOf(file) !== -1)
             }
         })
 
+        // Make sure directory exists
+        let destination = that.getDestinationPath()
+        shelljs.mkdir('-p', path.dirname(destination));
+
         readStream
             .pipe(packer)
-            .pipe(fs.createWriteStream(that.packageInfo.name + '.tar'))
+            .pipe(fs.createWriteStream(destination))
             .on('finish', () => done() )
+    }
+
+    getDestinationPath() {
+        var destination = this.destination
+
+        if (destination == '.')
+          return this.packageInfo.name + '.tar'
+
+        destination = path.normalize(destination.replace('{name}', this.packageInfo.name).replace('{version}', this.packageInfo.version))
+
+        return destination
     }
 
     cleanup(done) {
@@ -206,7 +226,7 @@ export default class Packager
         let nonIntermediatePrepacks = this.packagingPlan.prepack.filter(it => !that.isIntermediateFile(it))
         tree._.push(...nonIntermediatePrepacks.map(i => i + '.tar'))
 
-        console.log(chalk.bold.green(this.packageInfo.name + '.tar'))
+        console.log(chalk.bold.green(path.basename(this.getDestinationPath())))
         outputTree(tree)
 
         done()

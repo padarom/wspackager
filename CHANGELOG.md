@@ -1,3 +1,7 @@
+## **v1.3.0** (2017-05-04)
+- Replace some of the manual path separation in the packager with code using node's `path` module
+- Add the `-d/--destination` command line option to specify the destination of the package
+
 ## **v1.2.1** (2017-03-18)
 - Fix bug where `style.xml` file options with attributes weren't loaded
 
