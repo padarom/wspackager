@@ -193,7 +193,7 @@ export default class Packager
 
         readStream
             .pipe(packer)
-            .pipe(fstream.Writer({ path: destination }))
+            .pipe(fs.createWriteStream(destination))
             .on('finish', () => done() )
     }
 
