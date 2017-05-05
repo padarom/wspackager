@@ -10,7 +10,7 @@ let collectPips = function (value, list) {
 }
 
 program
-    .version('0.0.1')
+    .version('1.3.1')
     .option('-p, --pretend', 'only output resulting structure without packaging')
     .option('--pip [value]', 'if default files for custom PIPs are used, use this parameter to specify the default', collectPips, {})
     .option('-d, --destination [value]', 'The path the resulting archive will be saved to (defaults to cwd)', '.')

@@ -74,10 +74,10 @@ export default class Packager
     getFileStats(done) {
         fs.stat(this.getDestinationPath(), (err, stats) => {
             function bytesToSize(bytes) {
-               var sizes = ['Bytes', 'KB', 'MB', 'GB'];
-               if (bytes == 0) return '0 Byte';
-               var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-               return Math.round(bytes / Math.pow(1000, i), 2) + ' ' + sizes[i];
+               var sizes = ['Bytes', 'KB', 'MB', 'GB']
+               if (bytes == 0) return '0 Byte'
+               var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
+               return Math.round(bytes / Math.pow(1000, i), 2) + ' ' + sizes[i]
             };
 
             done(err, bytesToSize(stats.size))
@@ -176,6 +176,7 @@ export default class Packager
 
         let readStream = fstream.Reader({
             path: process.cwd(),
+            type: 'Directory',
             filter: function (entry) {
                 // Remove path up to cwd
                 let file = path.relative(process.cwd(), entry.path)
@@ -188,11 +189,11 @@ export default class Packager
 
         // Make sure directory exists
         let destination = that.getDestinationPath()
-        shelljs.mkdir('-p', path.dirname(destination));
+        shelljs.mkdir('-p', path.dirname(destination))
 
         readStream
             .pipe(packer)
-            .pipe(fs.createWriteStream(destination))
+            .pipe(fstream.Writer({ path: destination }))
             .on('finish', () => done() )
     }
 

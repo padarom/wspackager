@@ -1,3 +1,6 @@
+## **v1.3.1** (2017-05-05)
+- Fix a bug that includes an empty directory in the resulting package
+
 ## **v1.3.0** (2017-05-04)
 - Replace some of the manual path separation in the packager with code using node's `path` module
 - Add the `-d/--destination` command line option to specify the destination of the package
