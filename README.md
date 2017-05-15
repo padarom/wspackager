@@ -7,7 +7,7 @@ If you're looking to use wspackager as part of your build process, head over to 
 ## Installation and Usage
 Run `npm install -g wspackager` to install the package globally and have its binary added to your PATH.
 
-Once installed, simply run `wspackager` in the same folder that your packages `package.xml` is at.
+Once installed, simply run `wspackager` in the same folder that your `package.xml` is at.
 
 ![Tree diagram](/assets/tree-2.png?raw=true "Tree diagram of your plugin")
 
@@ -21,8 +21,8 @@ If you specified any optional packages or filenames for required packages, it wi
 ## Why choose this one over other packagers?
 - No configuration required
 - Folder structure independent (_no need to adjust your workflow_)
-- Plugin-aware packaging (_it only packages what your package instructions need_)
-- Supports packaging custom styles (parsing the `style.xml` and adding additional templates/images arhive)
+- Plugin-aware packaging (_it only packages what your PIPs specify_)
+- Supports packaging custom styles (parsing the `style.xml` and adding additional templates/images archive)
 - Compatible with WSC3.0 and default PIP filenames
 - Almost 1300 downloads of the predecessor packages [wcfutils](https://www.npmjs.com/package/wcfutils) and [wcf-utils](https://www.npmjs.com/package/wcf-utils) on npm
 - Doesn't require user-interaction and works well for CI (_visit the [Wiki](https://github.com/padarom/wspackager/wiki) for an example setup_)
@@ -61,7 +61,7 @@ If the default value of the `banana` PIP was `banana.xml` or `banana.tar` you wo
 $ wspackager --pip banana=banana.xml
 $ wspackager --pip banana=banana.tar
 ```
-In case you use multiple 3rd party PIPs, you can also stack this parameter like so:
+In case you use multiple 3rd party PIPs, you can also use this parameter multiple times like so:
 `wspackager --pip banana=banana.xml --pip foo=bar.xml`
 
 #### `--quiet` (`-q`)
