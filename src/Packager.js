@@ -7,6 +7,7 @@ import glob from 'glob'
 import path from 'path'
 import _ from 'lodash'
 import tar from 'tar'
+import zlib from 'zlib'
 import del from 'del'
 import fs from 'fs'
 
@@ -149,7 +150,8 @@ export default class Packager
     packageAll(done) {
         let that = this
         let packer = tar.Pack({ noProprietary: true, fromBase: true })
-
+        let gz = zlib.createGzip();
+        
         let streams = []
 
         let files = this.packagingPlan.direct.concat(
@@ -191,19 +193,28 @@ export default class Packager
         let destination = that.getDestinationPath()
         shelljs.mkdir('-p', path.dirname(destination))
 
-        readStream
-            .pipe(packer)
-            .pipe(fs.createWriteStream(destination))
-            .on('finish', () => done() )
+        if (destination.substr(-6) == 'tar.gz') {
+            readStream
+                .pipe(packer)
+                .pipe(gz)
+                .pipe(fs.createWriteStream(destination))
+                .on('finish', () => done() )
+        }
+        else {
+            readStream
+                .pipe(packer)
+                .pipe(fs.createWriteStream(destination))
+                .on('finish', () => done() )
+        }
     }
 
     getDestinationPath() {
         var destination = this.destination
 
         if (destination == '.')
-          return this.packageInfo.name + '.tar'
+          destination = '{name}_v{version}.tar.gz'
 
-        destination = path.normalize(destination.replace('{name}', this.packageInfo.name).replace('{version}', this.packageInfo.version))
+        destination = path.normalize(destination.replace('{name}', this.packageInfo.name).replace('{version}', this.packageInfo.version.replace(/\s+/gi,'_')))
 
         return destination
     }
