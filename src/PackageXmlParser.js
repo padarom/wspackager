@@ -73,7 +73,7 @@ export default class PackageXmlParser
 
         this.filesToPackage = list.files.map(it => { return {path: it, intermediate: false} })
 
-        if (list.styles) {
+        if (list && list.styles && list.styles[0]) {
             this.parseStyleXML(list.styles[0], callback)
         } else {
             callback()
@@ -126,7 +126,7 @@ export default class PackageXmlParser
                 if (path.optionalpackage) query = path.optionalpackage
 
                 for (let pack of query) {
-                    if (pack.$.file) packages.push(pack.$.file + '@')
+                    if (pack.$.file) packages.push(pack.$.file)
                 }
             }
         }
