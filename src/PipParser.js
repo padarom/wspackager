@@ -1,39 +1,20 @@
+import fs from 'fs'
+
+
 /**
  * A list of all PIPs shipped with WSC and their default file names.
  *
  * @see {@link https://github.com/WoltLab/WCF/tree/master/wcfsetup/install/files/lib/system/package/plugin}
  */
-const DEFAULT_PIP_FILENAMES = {
-    aclOption: 'aclOption.xml',
-    acpMenu: 'acpMenu.xml',
-    acpSearchProvider: 'acpSearchProvider.xml',
+var DEFAULT_PIP_FILENAMES = {
     acpTemplate: 'acptemplates.tar',
-    bbcode: 'bbcode.xml',
-    box: 'box.xml',
-    clipboard: 'clipboard.xml',
-    coreObject: 'coreObject.xml',
-    cronjob: 'cronjob.xml',
-    eventListener: 'eventListener.xml',
     file: 'files.tar',
     language: 'language/*.xml',
-    menu: 'menu.xml',
-    menuitem: 'menuitem.xml',
-    objectType: 'objectType.xml',
-    objectTypeDefinition: 'objectTypeDefinition.xml',
-    option: 'option.xml',
-    page: 'page.xml',
-    pip: 'packageInstallationPlugin.xml',
     script: null,
-    smiley: 'smiley.xml',
     sql: 'install.sql',
     style: null,
-    template: 'templates.tar',
-    templateListener: 'templateListener.xml',
-    userGroupOption: 'userGroupOption.xml',
-    userOption: 'userOption.xml',
-    userProfileMenu: 'userProfileMenu.xml',
-    userNotificationEvent: 'userNotificationEvent.xml'
-}
+    template: 'templates.tar'
+};
 
 export default class PipParser
 {
@@ -80,6 +61,11 @@ export default class PipParser
 
         if (pips[instruction.type]) {
             return pips[instruction.type]
+        }
+
+        // default value for all xml based pips
+        if (fs.existsSync(instruction.type + '.xml')) {
+            return instruction.type + '.xml';
         }
 
         throw new Error('No default filename was provided for the PIP "' + instruction.type + '"')
