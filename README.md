@@ -1,9 +1,6 @@
 # WoltLab Suite Packager [![npm](https://img.shields.io/npm/v/wspackager.svg?style=flat-square)](https://www.npmjs.com/package/wspackager)  [![npm](https://img.shields.io/npm/dt/wspackager.svg?style=flat-square)](https://www.npmjs.com/package/wspackager)
 A small library that handles WCF/WSC packaging for you. It automatically analyses the instructions in your `package.xml` to determine which files to package. You won't need to create any additional configuration files or adjust the way you work. Simply follow some very basic guidelines and run the program.
 
-#### Gulp plugin
-If you're looking to use wspackager as part of your build process, head over to the [`gulp-wspackager`](https://github.com/padarom/gulp-wspackager) repository for the gulp version of this tool.
-
 ## Installation and Usage
 Run `npm install -g wspackager` to install the package globally and have its binary added to your PATH.
 
