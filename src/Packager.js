@@ -125,6 +125,7 @@ export default class Packager
                         path: dir, type: 'Directory',
                         filter: function (entry) {
                             let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
+                            entry.props.mode |= (entry.props.mode >>> 2) & 0x111;
                             return dir == file || !that.isIntermediateFile(file)
                         }
                     }).on('error', done)
@@ -182,6 +183,7 @@ export default class Packager
             filter: function (entry) {
                 // Remove path up to cwd
                 let file = path.relative(process.cwd(), entry.path)
+                entry.props.mode |= (entry.props.mode >>> 2) & 0x111;
                 return !that.isIntermediateFile(file, true) &&
                     (!file // Zero-length-string = cwd
                     || folders.indexOf(file) !== -1
