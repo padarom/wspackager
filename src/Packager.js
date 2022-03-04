@@ -37,11 +37,14 @@ export default class Packager
             cb => this.cleanup(cb),
             cb => this.getFileStats(cb),
         ], (err, results) => {
-            let filesize = results.pop()
+            results = {
+                filename: results[3],
+                filesize: results[5]
+            }
 
             if (!quiet) {
                 console.log('-> ' + chalk.green.bold('Package generated')
-                    + ' (' + filesize + ')')
+                    + ' (' + results.filesize + ')')
             }
 
             done(err, results)
@@ -200,13 +203,13 @@ export default class Packager
                 .pipe(packer)
                 .pipe(gz)
                 .pipe(fs.createWriteStream(destination))
-                .on('finish', () => done() )
+                .on('finish', () => done(null, destination) )
         }
         else {
             readStream
                 .pipe(packer)
                 .pipe(fs.createWriteStream(destination))
-                .on('finish', () => done() )
+                .on('finish', () => done(null, destination) )
         }
     }
 

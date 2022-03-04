@@ -68,6 +68,6 @@ export default class PipParser
             return instruction.type + '.xml';
         }
 
-        throw new Error('No default filename was provided for the PIP "' + instruction.type + '"')
+        throw new Error('No file was found with the default filename and no filename was provided for the PIP "' + instruction.type + '"')
     }
 }

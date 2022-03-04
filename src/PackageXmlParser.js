@@ -14,10 +14,12 @@ export default class PackageXmlParser
             cb => this.parseInfo(cb),
             cb => this.parsePips(cb),
             cb => this.parseAdditionalPackages(cb),
-        ], function() {
-            runner.filesToPackage = that.filesToPackage
-            runner.xmlInfo = that.info
-            done()
+        ], function(err) {
+            if (!err) {
+                runner.filesToPackage = that.filesToPackage
+                runner.xmlInfo = that.info
+            }
+            done(err)
         })
     }
 
@@ -68,8 +70,14 @@ export default class PackageXmlParser
             })
         })
 
-        let parser = new PipParser(this.pips)
-        let list = parser.run(instructions)
+        let list
+        try {
+            let parser = new PipParser(this.pips)
+            list = parser.run(instructions)
+        } catch (err) {
+            callback(err);
+            return;
+        }
 
         this.filesToPackage = list.files.map(it => { return {path: it, intermediate: false} })
 
