@@ -119,21 +119,19 @@ export default class Packager
 
         for (let dir of this.packagingPlan.prepack) {
             tasks.push(cb => {
-                let packer = tar.Pack({ noProprietary: true, fromBase: true })
-                let writeStream = fs.createWriteStream(dir + '.tar')
-
-                packer.on('error', err => cb(err))
-                    .on('end', () => cb())
-                fstream.Reader({
-                        path: dir, type: 'Directory',
-                        filter: function (entry) {
-                            let file = entry.path.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
-                            entry.props.mode = '0777';
+                tar.c(
+                    { 
+                        file: dir + '.tar',
+                        filter: (filePath, stat) => {
+                            let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
                             return dir == file || !that.isIntermediateFile(file)
                         }
-                    }).on('error', done)
-                    .pipe(packer)
-                    .pipe(writeStream)
+                    },
+                    [ dir ],
+                    (err) => {
+                        done(err)
+                    }
+                )
             })
         }
 
@@ -153,8 +151,6 @@ export default class Packager
 
     packageAll(done) {
         let that = this
-        let packer = tar.Pack({ noProprietary: true, fromBase: true })
-        let gz = zlib.createGzip();
         
         let streams = []
 
@@ -180,37 +176,29 @@ export default class Packager
             (el, i, arr) => arr.indexOf(el) === i
         )
 
-        let readStream = fstream.Reader({
-            path: process.cwd(),
-            type: 'Directory',
-            filter: function (entry) {
-                // Remove path up to cwd
-                let file = path.relative(process.cwd(), entry.path)
-                entry.props.mode = '0777';
-                return !that.isIntermediateFile(file, true) &&
-                    (!file // Zero-length-string = cwd
-                    || folders.indexOf(file) !== -1
-                    || files.indexOf(file) !== -1)
-            }
-        })
-
         // Make sure directory exists
         let destination = that.getDestinationPath()
         shelljs.mkdir('-p', path.dirname(destination))
 
-        if (destination.substr(-6) == 'tar.gz') {
-            readStream
-                .pipe(packer)
-                .pipe(gz)
-                .pipe(fs.createWriteStream(destination))
-                .on('finish', () => done(null, destination) )
-        }
-        else {
-            readStream
-                .pipe(packer)
-                .pipe(fs.createWriteStream(destination))
-                .on('finish', () => done(null, destination) )
-        }
+        tar.c(
+            { 
+                file: destination,
+                preservePaths: false,
+                gzip: (destination.substr(-6) === 'tar.gz'),
+                filter: (filePath, stat) => {
+                    // Remove path up to cwd
+                    let file = path.relative(process.cwd(), filePath)
+                    return !that.isIntermediateFile(file, true) &&
+                        (!file // Zero-length-string = cwd
+                        || folders.indexOf(file) !== -1
+                        || files.indexOf(file) !== -1)
+                }
+            },
+            fs.readdirSync(process.cwd()),
+            (err) => {
+                done(err, destination)
+            }
+        )
     }
 
     getDestinationPath() {

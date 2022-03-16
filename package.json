@@ -30,7 +30,7 @@
     "glob": "^7.1.1",
     "lodash": "^4.17.4",
     "shelljs": "^0.8.5",
-    "tar": "^2.2.1",
+    "tar": "^6.1.11",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
