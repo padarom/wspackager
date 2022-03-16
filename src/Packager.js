@@ -1,6 +1,5 @@
 import { buildTree, outputTree } from './TreeBuilder'
 import fstream from 'fstream'
-import shelljs from 'shelljs'
 import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
@@ -178,7 +177,10 @@ export default class Packager
 
         // Make sure directory exists
         let destination = that.getDestinationPath()
-        shelljs.mkdir('-p', path.dirname(destination))
+        const dir = path.dirname(destination);
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
 
         tar.c(
             { 
