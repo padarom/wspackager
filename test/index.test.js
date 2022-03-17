@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 const tar = require('tar');
 const wspackager = require('../lib/index.js');
 
-const EXPECTED_FILE = 'com.example.test_v1.0.0.tar.gz';
+const EXPECTED_FILE = 'com.example.test_v1.0.0-{test_name}.tar.gz';
 const EXPECTED_CONTENT = [
     'files.tar',
     'templates.tar',
@@ -12,50 +12,56 @@ const EXPECTED_CONTENT = [
     'page.xml',
 ]
 
-describe('build package', () => {
+describe('build package (direct)', () => {
     test('it should create a tar.gz file', (done) => {
-        deletePreviousTestBuild();
-
-        try {
-            wspackager.run({source: getTestPackagePath(false)})
-            .then((result) => {
-                try {
-                    expectPackageBuild(result.filename)
-                    done()
-                } catch (error) {
+        const outputFilename = EXPECTED_FILE.replace('{test_name}', 'direct');
+        deletePreviousTestBuild(outputFilename, () => { 
+            try {
+                wspackager.run({
+                    source: getTestPackagePath(false),
+                    destination: outputFilename
+                })
+                .then((result) => {
+                    try {
+                        expectPackageBuild(result.filename)
+                        done()
+                    } catch (error) {
+                        done(error)
+                    }
+                })
+                .catch((error) => {
                     done(error)
-                }
-            })
-            .catch((error) => {
+                });
+            } catch(error) {
                 done(error)
-            });
-        } catch(error) {
-            done(error)
-        }
+            }
+        });
     })
 })
 
 describe('build package (cli)', () => {
     test('it should create a tar.gz file', (done) => {
-        deletePreviousTestBuild();
-
-        const command = `cd ${getTestPackagePath()} && node ../../lib/bin.js`;
-        exec(command, (err, stdout, stderr) => {
-            if (err) {
-                done(err)
-                return;
-            }
-            if (stderr) {
-                done(stderr)
-                return;
-            }
-            try {
-                expectPackageBuild()
-                done()
-            } catch (error) {
-                done(error)
-            }
-        })
+        const outputFilename = EXPECTED_FILE.replace('{test_name}', 'cli');
+        deletePreviousTestBuild(outputFilename, () => {
+            const command = `cd ${getTestPackagePath()} && node ../../lib/bin.js -d ${outputFilename}`;
+            exec(command, (err, stdout, stderr) => {
+                if (err) {
+                    done(err)
+                    return;
+                }
+                if (stderr) {
+                    done(stderr)
+                    return;
+                }
+                console.debug(stdout);
+                try {
+                    expectPackageBuild(outputFilename)
+                    done()
+                } catch (error) {
+                    done(error)
+                }
+            })
+        });
     })
 })
 
@@ -68,15 +74,11 @@ function getTestPackagePath(absolutePath = true) {
     return dir;
 }
 
-function deletePreviousTestBuild() {
-    try {
-        fs.unlinkSync(path.join(getTestPackagePath(), EXPECTED_FILE));
-    } catch {
-        // ignore
-    } 
+function deletePreviousTestBuild(filename, callback) {
+    fs.unlink(path.join(getTestPackagePath(), filename), err => callback());
 }
 
-function expectPackageBuild(filename = EXPECTED_FILE) {
+function expectPackageBuild(filename) {
     const createdPackage = path.join(getTestPackagePath(), filename);
     expect(fs.existsSync(createdPackage)).toBe(true)
 
