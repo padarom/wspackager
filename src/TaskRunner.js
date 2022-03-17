@@ -9,7 +9,6 @@ export default class TaskRunner
 {
     constructor(options) {
         this.options = _.defaults(options, {
-            gzip: false,
             pips: {},
             quiet: false,
             source: '.',
