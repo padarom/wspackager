@@ -1,7 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const tar = require('tar');
 const wspackager = require('../lib/index.js');
+
+const EXPECTED_FILE = 'com.example.test_v1.0.0.tar.gz';
+const EXPECTED_CONTENT = [
+    'files.tar',
+    'templates.tar',
+    'package.xml',
+    'page.xml',
+]
 
 describe('build package', () => {
     test('it should create a tar.gz file', (done) => {
@@ -61,13 +70,24 @@ function getTestPackagePath(absolutePath = true) {
 
 function deletePreviousTestBuild() {
     try {
-        fs.unlinkSync(path.join(getTestPackagePath, 'com.example.test_v1.0.0.tar.gz'));
+        fs.unlinkSync(path.join(getTestPackagePath(), EXPECTED_FILE));
     } catch {
         // ignore
     } 
 }
 
-function expectPackageBuild(filename = 'com.example.test_v1.0.0.tar.gz') {
+function expectPackageBuild(filename = EXPECTED_FILE) {
     const createdPackage = path.join(getTestPackagePath(), filename);
     expect(fs.existsSync(createdPackage)).toBe(true)
+
+    let content = [];
+
+    tar.t({
+        file: filename,
+        onentry: entry => {
+            content.push(entry.path);
+        },
+        sync: true
+    })
+    expect(EXPECTED_CONTENT.sort()).toEqual(content.sort());
 }
