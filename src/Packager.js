@@ -7,7 +7,6 @@ import path from 'path'
 import _ from 'lodash'
 import tar from 'tar'
 import zlib from 'zlib'
-import del from 'del'
 import fs from 'fs'
 
 export default class Packager
@@ -215,9 +214,11 @@ export default class Packager
     }
 
     cleanup(done) {
-        del(this.packagingPlan.prepack.map(i => i + '.tar')).then(paths => {
-            done()
-        })
+        const deleteTasks = this.packagingPlan.prepack.map(dir => {
+            return (callback) => fs.unlink(dir + '.tar', () => callback())
+        });
+
+        async.parallel(deleteTasks, () => done());
     }
 
     writeTreeStructure(quiet, done) {

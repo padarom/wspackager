@@ -18,7 +18,9 @@
       ]
     ],
     "plugins": [
-        ["@babel/transform-runtime"]
+      [
+        "@babel/transform-runtime"
+      ]
     ]
   },
   "repository": {
@@ -39,7 +41,6 @@
     "async": "^2.1.4",
     "chalk": "^1.1.3",
     "commander": "^2.9.0",
-    "del": "^2.2.2",
     "fstream": "^1.0.10",
     "glob": "^7.1.1",
     "lodash": "^4.17.4",
