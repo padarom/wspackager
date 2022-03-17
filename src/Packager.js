@@ -1,12 +1,10 @@
 import { buildTree, outputTree } from './TreeBuilder'
-import fstream from 'fstream'
 import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
 import path from 'path'
 import _ from 'lodash'
 import tar from 'tar'
-import zlib from 'zlib'
 import fs from 'fs'
 
 export default class Packager
