@@ -113,12 +113,11 @@ export default class Packager
 
     prepackage(done) {
         let that = this
-        let tasks = []
 
-        for (let dir of this.packagingPlan.prepack) {
-            tasks.push(cb => {
+        const tasks = this.packagingPlan.prepack.map(dir => {
+            return (callback) => {
                 tar.c(
-                    { 
+                    {
                         file: dir + '.tar',
                         filter: (filePath, stat) => {
                             let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
@@ -127,11 +126,11 @@ export default class Packager
                     },
                     [ dir ],
                     (err) => {
-                        done(err)
+                        callback(err)
                     }
                 )
-            })
-        }
+            }
+        });
 
         async.waterfall(tasks, err => done(err))
     }
