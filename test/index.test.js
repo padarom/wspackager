@@ -15,12 +15,14 @@ const EXPECTED_CONTENT = [
 describe('build package (direct)', () => {
     test('it should create a tar.gz file', (done) => {
         const outputFilename = EXPECTED_FILE.replace('{test_name}', 'direct');
+        const packageDir = getTestPackagePath(false);
+
         deletePreviousTestBuild(outputFilename, () => { 
             try {
                 wspackager.run({
                     cwd: __dirname,
-                    source: getTestPackagePath(false),
-                    destination: outputFilename
+                    source: packageDir,
+                    destination: path.join(packageDir, outputFilename)
                 })
                 .then((result) => {
                     try {

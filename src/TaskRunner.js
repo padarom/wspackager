@@ -16,7 +16,12 @@ export default class TaskRunner
             destination: '.',
             cwd: process.cwd()
         })
-        process.chdir(path.resolve(this.options.cwd, this.options.source));
+
+        // resolve paths into absolute paths
+        this.options.source = path.resolve(this.options.cwd, this.options.source)
+        this.options.destination = path.resolve(this.options.cwd, this.options.destination)
+
+        process.chdir(this.options.source);
         this.xml = null
     }
 

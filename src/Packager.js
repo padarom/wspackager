@@ -25,17 +25,18 @@ export default class Packager
     run(done, destination, quiet) {
         this.destination = destination
 
-        async.series([
-            cb => this.findLocalFiles(cb),
-            cb => this.writeTreeStructure(quiet, cb),
-            cb => this.prepackage(cb),
-            cb => this.packageAll(cb),
-            cb => this.cleanup(cb),
-            cb => this.getFileStats(cb),
-        ], (err, results) => {
+        async.series({
+            localFiles:     cb => this.findLocalFiles(cb),
+            treeStructure:  cb => this.writeTreeStructure(quiet, cb),
+            prepackage:     cb => this.prepackage(cb),
+            package:        cb => this.packageAll(cb),
+            cleanup:        cb => this.cleanup(cb),
+            fileStats:      cb => this.getFileStats(cb),
+        }, (err, results) => {
             results = {
-                filename: results[3],
-                filesize: results[5]
+                filename: path.basename(results.package),
+                path: results.package,
+                filesize: results.fileStats
             }
 
             if (!quiet) {
