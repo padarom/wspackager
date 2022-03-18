@@ -34,7 +34,7 @@ export default class Packager
             fileStats:      cb => this.getFileStats(cb),
         }, (err, results) => {
             results = {
-                filename: path.basename(results.package),
+                filename: results.package === undefined ? results.package : path.basename(results.package),
                 path: results.package,
                 filesize: results.fileStats
             }
@@ -118,13 +118,14 @@ export default class Packager
                 tar.c(
                     {
                         file: dir + '.tar',
+                        cwd: dir,
                         portable: true,
                         filter: (filePath, stat) => {
                             let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
                             return dir == file || !that.isIntermediateFile(file)
                         }
                     },
-                    [ dir ],
+                    fs.readdirSync(dir),
                     (err) => {
                         callback(err)
                     }
