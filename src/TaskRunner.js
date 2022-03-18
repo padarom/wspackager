@@ -1,5 +1,6 @@
 import fs from 'fs'
 import _ from 'lodash'
+import path from 'path'
 import process from 'process'
 import async from 'async'
 import Packager from './Packager'
@@ -12,9 +13,10 @@ export default class TaskRunner
             pips: {},
             quiet: false,
             source: '.',
-            destination: '.'
+            destination: '.',
+            cwd: process.cwd()
         })
-        process.chdir(this.options.source);
+        process.chdir(path.resolve(this.options.cwd, this.options.source));
         this.xml = null
     }
 

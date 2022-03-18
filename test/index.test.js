@@ -18,6 +18,7 @@ describe('build package (direct)', () => {
         deletePreviousTestBuild(outputFilename, () => { 
             try {
                 wspackager.run({
+                    cwd: __dirname,
                     source: getTestPackagePath(false),
                     destination: outputFilename
                 })
