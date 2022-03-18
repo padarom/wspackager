@@ -42,9 +42,12 @@ describe('build package (direct)', () => {
 describe('build package (cli)', () => {
     test('it should create a tar.gz file', (done) => {
         const outputFilename = EXPECTED_FILE.replace('{test_name}', 'cli');
+
         deletePreviousTestBuild(outputFilename, () => {
+
             const command = `cd ${getTestPackagePath()} && node ../../lib/bin.js -d ${outputFilename}`;
-            exec(command, (err, stdout, stderr) => {
+
+            const child = exec(command, (err, stdout, stderr) => {
                 if (err) {
                     done(err)
                     return;
@@ -54,6 +57,9 @@ describe('build package (cli)', () => {
                     return;
                 }
                 console.debug(stdout);
+            })
+
+            child.on('exit', () => {
                 try {
                     expectPackageBuild(outputFilename)
                     done()
@@ -85,7 +91,7 @@ function expectPackageBuild(filename) {
     let content = [];
 
     tar.t({
-        file: filename,
+        file: createdPackage,
         onentry: entry => {
             content.push(entry.path);
         },
