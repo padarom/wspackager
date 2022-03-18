@@ -117,6 +117,7 @@ export default class Packager
                 tar.c(
                     {
                         file: dir + '.tar',
+                        portable: true,
                         filter: (filePath, stat) => {
                             let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
                             return dir == file || !that.isIntermediateFile(file)
@@ -181,6 +182,7 @@ export default class Packager
         tar.c(
             { 
                 file: destination,
+                portable: true,
                 preservePaths: false,
                 gzip: (destination.substr(-6) === 'tar.gz'),
                 filter: (filePath, stat) => {
