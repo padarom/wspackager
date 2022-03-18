@@ -204,8 +204,8 @@ export default class Packager
     getDestinationPath() {
         var destination = this.destination
 
-        if (destination == '.')
-          destination = '{name}_v{version}.tar.gz'
+        if (path.extname(destination) === '')
+          destination = path.join(destination, '{name}_v{version}.tar.gz');
 
         destination = path.normalize(destination.replace('{name}', this.packageInfo.name).replace('{version}', this.packageInfo.version.replace(/\s+/gi,'_')))
 
