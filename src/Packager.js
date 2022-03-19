@@ -49,25 +49,34 @@ export default class Packager
     }
 
     getFileProcessingList() {
-        let files = this.filesToPackage.map(item => item.path)
-
-        return files.map(item => {
-            return {
-                original: item,
-                adjusted: item.replace(/\.tar$/i, '')
-            }
-        }).map(item => {
+        return this.filesToPackage.map(item => {
             return (callback) => {
-                if (!glob.hasMagic(item.adjusted)) {
-                    item.paths = [item.adjusted]
-                    callback(null, item)
-                    return
+                const path = item.path;
+                const adjustedPath = path.replace(/\.tar(\.gz)?$/i, '');
+                const isPack = ['.tar', '.tar.gz', '.tgz']
+                    .some(end => path.endsWith(end))
+                const newItem = {
+                    original: path,
+                    isPack: isPack,
+                    exists: false
                 }
-
-                glob(item.adjusted, (err, files) => {
-                    item.paths = files
-                    callback(err, item)
-                })
+    
+                if (glob.hasMagic(adjustedPath)) {
+                    glob(adjustedPath, (err, files) => {
+                        newItem.paths = files
+                        callback(err, newItem)
+                    })
+                } else {
+                    fs.stat(path, function(err, stats) {
+                        if (err) {
+                            newItem.paths = [adjustedPath]
+                        } else {
+                            newItem.paths = [path]
+                            newItem.exists = true
+                        }
+                        callback(null, newItem)
+                    })
+                }
             }
         })
     }
@@ -93,7 +102,7 @@ export default class Packager
             var prepack = []
             var direct = ['package.xml']
             results.forEach(instruction => {
-                if (instruction.original.endsWith('.tar')) {
+                if (instruction.isPack && !instruction.exists) {
                     prepack = prepack.concat(instruction.paths)
                 } else {
                     direct = direct.concat(
