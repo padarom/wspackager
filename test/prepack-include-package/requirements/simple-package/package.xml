@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/2019/package.xsd" name="com.example.test">
+<package name="com.example.test.level2" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/2019/package.xsd">
 	<packageinformation>
 		<!-- com.example.test -->
 		<packagename>Simple Package</packagename>
@@ -14,13 +14,6 @@
 	<excludedpackages>
 		<excludedpackage version="6.0.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
-
-	<requiredpackages>
-		<requiredpackage minversion="3.0.0">com.woltlab.wcf</requiredpackage>
-		<requiredpackage minversion="1.0.0" file="requirements/com.example.test.level2.tar.gz">com.example.test.level2</requiredpackage>
-		<requiredpackage minversion="1.0.0" file="requirements/com.example.test.level2.tar">com.example.test.level2</requiredpackage>
-	</requiredpackages>
-
 	<instructions type="install">
 		<instruction type="file" />
 		<instruction type="template" />

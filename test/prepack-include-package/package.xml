@@ -16,9 +16,7 @@
 	</excludedpackages>
 
 	<requiredpackages>
-		<requiredpackage minversion="3.0.0">com.woltlab.wcf</requiredpackage>
 		<requiredpackage minversion="1.0.0" file="requirements/com.example.test.level2.tar.gz">com.example.test.level2</requiredpackage>
-		<requiredpackage minversion="1.0.0" file="requirements/com.example.test.level2.tar">com.example.test.level2</requiredpackage>
 	</requiredpackages>
 
 	<instructions type="install">

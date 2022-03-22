@@ -29,13 +29,16 @@ describe('include package tests', () => {
         'package.xml',
         'page.xml',
         'requirements/',
-        'requirements/com.example.test.tar.gz'
+        'requirements/com.example.test.level2.tar.gz'
     ];
 
     test('it should include requirements', (done) => {
         new TestRunner('include-package',
-            EXPECTED_CONTENT.concat('requirements/com.example.test.tar')
+            EXPECTED_CONTENT.concat('requirements/com.example.test.level2.tar')
         ).run(done);
+    })
+    test('it should prepack requirements and include', (done) => {
+        new TestRunner('prepack-include-package', EXPECTED_CONTENT).run(done);
     })
 })
 
@@ -55,7 +58,8 @@ class TestRunner {
                 wspackager.run({
                     cwd: __dirname,
                     source: packageDir,
-                    destination: path.join(packageDir, outputFilename)
+                    destination: path.join(packageDir, outputFilename),
+                    quiet: true
                 })
                 .then((result) => {
                     try {
