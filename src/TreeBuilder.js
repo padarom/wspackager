@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import Util from './Util'
 
 const log = console.log
 
@@ -40,7 +41,7 @@ export function outputTree(tree, level=0, levelsDone=[]) {
         }
 
         // The item itself.
-        let itemText = (isFolder ? chalk.bold(item) : (item.endsWith('.tar') ? chalk.bold.cyan(item) : item))
+        let itemText = (isFolder ? chalk.bold(item) : (Util.isTarball(item) ? chalk.bold.cyan(item) : item))
 
         // Log the item
         log(prefix + symbol + '── ' + itemText)

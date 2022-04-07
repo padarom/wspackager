@@ -12,3 +12,5 @@ lib/*
 
 test/**/*.tar
 test/**/*.tar.gz
+!test/**/requirements/*.tar
+!test/**/requirements/*.tar.gz
