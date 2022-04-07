@@ -10,7 +10,7 @@ export default class PackageXmlParser
         this.pips = runner.options.pips
 
         async.series([
-            cb => this.readXml(cb),
+            cb => this.readXml('package.xml', cb),
             cb => this.parseInfo(cb),
             cb => this.parsePips(cb),
             cb => this.parseAdditionalPackages(cb),
@@ -23,10 +23,10 @@ export default class PackageXmlParser
         })
     }
 
-    readXml(callback) {
+    readXml(file, callback) {
         let that = this
 
-        fs.readFile('package.xml', function(err, data) {
+        fs.readFile(file, function(err, data) {
             var parser = new xml2js.Parser()
 
             if (err) {
@@ -134,7 +134,14 @@ export default class PackageXmlParser
                 if (path.optionalpackage) query = path.optionalpackage
 
                 for (let pack of query) {
-                    if (pack.$.file) packages.push(pack.$.file)
+                    if (pack.$.file) {
+                        packages.push({
+                            path: pack.$.file,
+                            intermediate: false,
+                            isPackage: true,
+                            identifier: pack._
+                        })
+                    }
                 }
             }
         }
@@ -142,7 +149,6 @@ export default class PackageXmlParser
         if (optionals) addPackagePaths(optionals)
         if (requireds) addPackagePaths(requireds)
 
-        packages = packages.map(it => { return {path: it, intermediate: false} })
         this.filesToPackage = this.filesToPackage.concat(packages)
 
         callback()

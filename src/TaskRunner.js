@@ -21,12 +21,15 @@ export default class TaskRunner
         this.options.source = path.resolve(this.options.cwd, this.options.source)
         this.options.destination = path.resolve(this.options.cwd, this.options.destination)
 
-        process.chdir(this.options.source);
         this.xml = null
     }
 
     run() {
         let that = this
+
+        // TODO don't use chdir to prevent potential issues with cwd unexpectedly changing
+        this.oldCwd = process.cwd()
+        process.chdir(this.options.source)
         
         return new Promise((resolve, reject) => {
             // Run the following instructions in series.
@@ -37,6 +40,8 @@ export default class TaskRunner
                     cb => that.runPackager(cb),
                 ], 
                 (err, results) => {
+                    // restore current working directory
+                    process.chdir(this.oldCwd)
                     // If any of the functions threw an error, exit here.
                     if (err) {
                         reject(err);

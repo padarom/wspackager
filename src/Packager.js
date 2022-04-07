@@ -1,4 +1,7 @@
 import { buildTree, outputTree } from './TreeBuilder'
+import PackageXmlParser from './PackageXmlParser'
+import TaskRunner from './TaskRunner'
+import Util from './Util'
 import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
@@ -30,44 +33,63 @@ export default class Packager
             treeStructure:  cb => this.writeTreeStructure(quiet, cb),
             prepackage:     cb => this.prepackage(cb),
             package:        cb => this.packageAll(cb),
-            cleanup:        cb => this.cleanup(cb),
             fileStats:      cb => this.getFileStats(cb),
         }, (err, results) => {
-            results = {
-                filename: results.package === undefined ? results.package : path.basename(results.package),
-                path: results.package,
-                filesize: results.fileStats
-            }
-
-            if (!quiet) {
-                console.log('-> ' + chalk.green.bold('Package generated')
-                    + ' (' + results.filesize + ')')
-            }
-
-            done(err, results)
+            // always run cleanup
+            this.cleanup(() => {
+                if (err) {
+                    done(err)
+                    return
+                }
+                results = {
+                    filename: results.package === undefined ? results.package : path.basename(results.package),
+                    path: results.package,
+                    filesize: results.fileStats
+                }
+    
+                if (!quiet) {
+                    console.log('-> ' + chalk.green.bold('Package generated')
+                        + ' (' + results.filesize + ')')
+                }
+    
+                done(err, results)
+            })
         })
     }
 
     getFileProcessingList() {
-        let files = this.filesToPackage.map(item => item.path)
-
-        return files.map(item => {
-            return {
-                original: item,
-                adjusted: item.replace(/\.tar$/i, '')
-            }
-        }).map(item => {
+        return this.filesToPackage.map(item => {
             return (callback) => {
-                if (!glob.hasMagic(item.adjusted)) {
-                    item.paths = [item.adjusted]
-                    callback(null, item)
-                    return
+                const path = item.path;
+                const adjustedPath = path.replace(/\.tar(\.gz)?$/i, '');
+                const newItem = {
+                    original: path,
+                    isPackage: item.isPackage,
+                    identifier: item.identifier,
+                    originalExists: false
                 }
-
-                glob(item.adjusted, (err, files) => {
-                    item.paths = files
-                    callback(err, item)
-                })
+    
+                if (glob.hasMagic(adjustedPath)) {
+                    glob(adjustedPath, (err, files) => {
+                        newItem.paths = files
+                        callback(err, newItem)
+                    })
+                } else {
+                    fs.stat(path, function(err, stats) {
+                        if (err) {
+                            newItem.paths = [adjustedPath]
+                        } else {
+                            if (item.isPackage) {
+                                // add package as tarball and not directory
+                                newItem.paths = [path]
+                            } else {
+                                newItem.paths = [adjustedPath]
+                            }
+                            newItem.originalExists = true
+                        }
+                        callback(null, newItem)
+                    })
+                }
             }
         })
     }
@@ -93,8 +115,11 @@ export default class Packager
             var prepack = []
             var direct = ['package.xml']
             results.forEach(instruction => {
-                if (instruction.original.endsWith('.tar')) {
-                    prepack = prepack.concat(instruction.paths)
+                if (
+                    (instruction.isPackage && !instruction.originalExists) ||
+                    (!instruction.isPackage && Util.isTarball(instruction.original))
+                ) {
+                    prepack = prepack.concat(instruction)
                 } else {
                     direct = direct.concat(
                         instruction.paths.map(i => i.replace(/\.tar@$/, '.tar'))
@@ -113,27 +138,124 @@ export default class Packager
     prepackage(done) {
         let that = this
 
-        const tasks = this.packagingPlan.prepack.map(dir => {
+        const tasks = this.packagingPlan.prepack.map(instruction => {
             return (callback) => {
-                tar.c(
-                    {
-                        file: dir + '.tar',
-                        cwd: dir,
-                        portable: true,
-                        filter: (filePath, stat) => {
-                            let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
-                            return dir == file || !that.isIntermediateFile(file)
+                if (instruction.isPackage) {
+                    // handle additional packages
+                    that.prepackAdditionalPackages(instruction, callback)
+                } else {
+                    var dir = instruction.paths[0]
+                    tar.c(
+                        {
+                            file: dir + '.tar',
+                            cwd: dir,
+                            portable: true,
+                            filter: (filePath, stat) => {
+                                let file = filePath.replace(process.cwd() + path.sep, '').replace(/\\/g, '/')
+                                return dir == file || !that.isIntermediateFile(file)
+                            }
+                        },
+                        fs.readdirSync(dir),
+                        (err) => {
+                            callback(err)
                         }
-                    },
-                    fs.readdirSync(dir),
-                    (err) => {
-                        callback(err)
-                    }
-                )
+                    )
+                }
             }
         });
 
         async.waterfall(tasks, err => done(err))
+    }
+
+    prepackAdditionalPackages(instruction, callback) {
+        var dir = instruction.paths[0]
+        var options = {
+            destination: instruction.original,
+            quiet: true
+        }
+
+        const runPackager = () => {
+            new TaskRunner(options).run()
+            .then(result => callback())
+            .catch(callback)
+        }
+
+        fs.stat(dir, (err, stats) => {
+            if (!err) {
+                options.source = dir
+                runPackager()
+            }
+            // try to find package directory
+            else {
+                dir = path.dirname(dir)
+                this.findAdditionalPackage(dir, instruction.identifier, (err, result) => {
+                    if (err) {
+                        callback(err)
+                        return
+                    }
+                    if (!result) {
+                        callback(`Unable to locate package '${instruction.identifier}', which is defined to be included`)
+                        return
+                    }
+                    options.source = result
+                    runPackager()
+                })
+            }
+        })
+    }
+
+    /**
+     * Tries to find a package by reading all package.xml files
+     * in the directory and comparing the identifier name
+     * 
+     * @param {string} directory directory to recursively look in
+     * @param {string} identifier package identifier name to look for
+     * @param {function} done callback 
+     */
+    findAdditionalPackage(directory, identifier, done) {
+        glob(path.join(directory, '/**/package.xml'), (err, files) => {
+            if (err) {
+                done(err)
+                return
+            }
+            if (files.length <= 0) {
+                done()
+                return
+            }
+            const parser = new PackageXmlParser()
+            let tasks = files.map(file => {
+                return (callback) => {
+                    async.series([
+                        cb => parser.readXml(file, cb),
+                        cb => parser.parseInfo(cb)
+                    ], (err) => {
+                        if (err) {
+                            callback(err)
+                            return
+                        }
+                        var dirFound = null
+                        if (parser.info.name === identifier) {
+                            dirFound = path.dirname(file)
+                        }
+                        callback(null, dirFound)
+                    })
+                }
+            })
+
+            // run all tasks and only return an error if all failed
+            async.race(async.reflectAll(tasks), (err, result) => {
+                var error = err;
+                if (!result.error) {
+                    if (result.value) {
+                        done(null, result.value)
+                        return
+                    }
+                } else {
+                    error = result.error
+                }
+                done(error)
+            })
+        })
     }
 
     isIntermediateFile(name, omitTar) {
@@ -153,7 +275,7 @@ export default class Packager
         let streams = []
 
         let files = this.packagingPlan.direct.concat(
-            this.packagingPlan.prepack.map(item => item + '.tar')
+            this.packagingPlan.prepack.map(item => item.original)
         ).map(path.normalize) // Windows compatibility
 
         var folders = []
@@ -215,8 +337,20 @@ export default class Packager
     }
 
     cleanup(done) {
-        const deleteTasks = this.packagingPlan.prepack.map(dir => {
-            return (callback) => fs.unlink(dir + '.tar', () => callback())
+        if (
+            !this.packagingPlan ||
+            !this.packagingPlan.prepack ||
+            this.packagingPlan.prepack.length <= 0
+        ) {
+            done()
+            return
+        }
+        const deleteTasks = this.packagingPlan.prepack.map(it => {
+            // make sure it only deletes tarball's
+            if (!Util.isTarball(it.original)) {
+                return
+            }
+            return (callback) => fs.unlink(it.original, () => callback())
         });
 
         async.parallel(deleteTasks, () => done());
@@ -232,8 +366,12 @@ export default class Packager
             tree = buildTree(tree, file)
         })
 
-        let nonIntermediatePrepacks = this.packagingPlan.prepack.filter(it => !that.isIntermediateFile(it))
-        tree._.push(...nonIntermediatePrepacks.map(i => i + '.tar'))
+        let nonIntermediatePrepacks = this.packagingPlan.prepack
+            .filter(it => !that.isIntermediateFile(it.paths[0]))
+        
+        nonIntermediatePrepacks.forEach(it => {
+            tree = buildTree(tree, it.original)
+        })
 
         console.log(chalk.bold.green(path.basename(this.getDestinationPath())))
         outputTree(tree)
