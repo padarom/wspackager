@@ -6,7 +6,7 @@ import chalk from 'chalk'
 import async from 'async'
 import glob from 'glob'
 import path from 'path'
-import _ from 'lodash'
+import uniqBy from 'lodash.uniqby'
 import tar from 'tar'
 import fs from 'fs'
 
@@ -22,7 +22,7 @@ export default class Packager
         })
 
         // Remove duplicates from array
-        this.filesToPackage = _.uniqBy(files, 'path')
+        this.filesToPackage = uniqBy(files, 'path')
     }
 
     run(done, destination, quiet) {

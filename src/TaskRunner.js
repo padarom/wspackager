@@ -1,5 +1,5 @@
 import fs from 'fs'
-import _ from 'lodash'
+import defaults from 'lodash.defaults'
 import path from 'path'
 import process from 'process'
 import async from 'async'
@@ -9,7 +9,7 @@ import PackageXmlParser from './PackageXmlParser'
 export default class TaskRunner
 {
     constructor(options) {
-        this.options = _.defaults(options, {
+        this.options = defaults(options, {
             pips: {},
             quiet: false,
             source: '.',
