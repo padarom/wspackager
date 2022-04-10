@@ -41,7 +41,6 @@
     "async": "^3.2.3",
     "chalk": "^4.1.2",
     "commander": "^9.0.0",
-    "fstream": "^1.0.10",
     "glob": "^7.1.1",
     "lodash.defaults": "^4.2.0",
     "lodash.uniqby": "^4.7.0",
