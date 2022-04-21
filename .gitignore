@@ -9,3 +9,8 @@ sandbox
 
 lib/*
 !lib/.gitkeep
+
+test/**/*.tar
+test/**/*.tar.gz
+!test/**/requirements/*.tar
+!test/**/requirements/*.tar.gz
