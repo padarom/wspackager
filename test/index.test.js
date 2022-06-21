@@ -20,6 +20,9 @@ describe('usage tests', () => {
     test('it should create a tar.gz file (cli)', (done) => {
         new TestRunner('simple-package', EXPECTED_CONTENT).runCli(done);
     })
+    test('it should create a tar.gz file (directory name with dots)', (done) => {
+        new TestRunner('special.package.name', EXPECTED_CONTENT).runCli(done, false, 'com.example.test_v1.0.0.tar.gz');
+    })
 })
 
 describe('include package tests', () => {
@@ -78,19 +81,27 @@ class TestRunner {
         });
     }
 
-    runCli(done) {
-        const outputFilename = EXPECTED_FILE.replace('{test_name}', 'cli');
+    runCli(done, useDestination = true, outputFilename = false) {
+        var isDone = false;
+        if (!outputFilename) {
+            outputFilename = EXPECTED_FILE.replace('{test_name}', 'cli');
+        }
 
         this.#deletePreviousTestBuild(outputFilename, () => {
 
-            const command = `cd ${this.#getTestPackagePath()} && node ../../lib/bin.js -d ${outputFilename}`;
+            let command = `cd ${this.#getTestPackagePath()} && node ../../lib/bin.js`;
+            if (useDestination) {
+                command += ` -d ${outputFilename}`;
+            }
 
             const child = exec(command, (err, stdout, stderr) => {
                 if (err) {
+                    isDone = true;
                     done(err)
                     return;
                 }
                 if (stderr) {
+                    isDone = true;
                     done(stderr)
                     return;
                 }
@@ -99,8 +110,10 @@ class TestRunner {
 
             child.on('close', () => {
                 try {
-                    this.#expectPackageBuild(outputFilename)
-                    done()
+                    if (!isDone) {
+                        this.#expectPackageBuild(outputFilename)
+                        done()
+                    }
                 } catch (error) {
                     done(error)
                 }
