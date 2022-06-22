@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/2019/page.xsd">
+	<import>
+		<page identifier="com.example.test.Test">
+			<controller>wcf\page\TestPage</controller>
+			<name language="en">Test Page</name>
+			<pageType>system</pageType>
+		</page>
+	</import>
+</data>
