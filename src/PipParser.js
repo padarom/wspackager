@@ -1,6 +1,5 @@
 import fs from 'fs'
 
-
 /**
  * A list of all PIPs shipped with WSC and their default file names.
  *
