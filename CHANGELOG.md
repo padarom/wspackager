@@ -1,3 +1,15 @@
+## **v1.5.0** (2022-07-27)
+- Add support for the `<void/>` package instruction
+
+## **v1.4.0** (2022-04-21)
+Thanks to @Sir-Will for these additions!
+
+- Add main file for usage in node scripts
+- Add option to define source directory
+- Add basic jest tests
+- Updat all dependencies
+- Add .tar.gzip output
+
 ## **v1.3.1** (2017-05-05)
 - Fix a bug that includes an empty directory in the resulting package
 

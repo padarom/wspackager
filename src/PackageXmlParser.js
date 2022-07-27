@@ -55,13 +55,14 @@ export default class PackageXmlParser
         this.info = info
 
         callback()
-
     }
 
     parsePips(callback) {
         var instructions = []
         this.xml.package.instructions.forEach(function (element) {
             var instruction = element.instruction
+            if (element.void) return
+            
             instruction.forEach(function (element) {
                 instructions.push({
                     type: element.$.type,

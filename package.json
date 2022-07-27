@@ -1,10 +1,10 @@
 {
   "name": "wspackager",
   "description": "A small application that handles WCF/WSC packaging for you. Previously known as \"wcfutils\"",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "main": "lib/index.js",
   "scripts": {
-    "compile": "npx babel src/ -d lib/",
+    "compile": "babel src/ -d lib/",
     "prepublish": "npm run compile",
     "test": "npm run compile && jest"
   },
