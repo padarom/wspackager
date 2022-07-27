@@ -1,4 +1,4 @@
-## **v1.5.0** (2022-07-?)
+## **v1.5.0** (2022-07-27)
 - Add support for the `<void/>` package instruction
 
 ## **v1.4.0** (2022-04-21)
