@@ -2,6 +2,7 @@
 
 import TaskRunner from './TaskRunner'
 import program from 'commander'
+import pkg from '../package.json'
 
 let collectPips = function (value, list) {
     var splitted = value.split('=')
@@ -10,7 +11,7 @@ let collectPips = function (value, list) {
 }
 
 program
-    .version('1.3.1')
+    .version(pkg.version)
     .option('--pip [value]', 'if default files for custom PIPs are used, use this parameter to specify the default', collectPips, {})
     .option('-s, --source [value]', 'The path where the package files should be read from (defaults to cwd)', '.')
     .option('-d, --destination [value]', 'The path the resulting archive will be saved to (defaults to cwd)', '.')
